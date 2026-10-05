@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { api, ApiError } from "../api";
 import { useAuth } from "../auth";
+import { findNarration } from "../lib/narration";
 import { phonicsBeats, segmentToken, type PhonicsBeat } from "../lib/phonics";
 import { glossKey, playSounds, softTick, speakNaturally, stopSpeaking } from "../lib/speech";
 import type { AlignmentWord, BookDetail, Gloss, Page } from "../types";
@@ -159,6 +160,24 @@ export function Reader() {
     setActive(null);
     const words = page.alignment_data;
     const speed = rateRef.current;
+    const narration = !phonicsRef.current ? findNarration(words) : null;
+    if (narration) {
+      const audio = new Audio(narration.url);
+      audio.preservesPitch = true;
+      const safari = audio as HTMLAudioElement & { webkitPreservesPitch?: boolean };
+      safari.webkitPreservesPitch = true;
+      audio.playbackRate = speed;
+      audioRef.current = audio;
+      const loop = () => {
+        paint(narration.words, audio.currentTime);
+        if (!audio.paused && !audio.ended) rafRef.current = requestAnimationFrame(loop);
+      };
+      audio.onended = () => finishPlayback();
+      void audio.play().then(() => {
+        rafRef.current = requestAnimationFrame(loop);
+      }).catch(() => speakSentence(words, speed));
+      return;
+    }
     if (!page.audio_url.startsWith("speech:") && page.audio_url) {
       const audio = new Audio(page.audio_url);
       audio.preservesPitch = true;
@@ -201,7 +220,7 @@ export function Reader() {
   function speakSentence(words: AlignmentWord[], speed: number) {
     if (phonicsRef.current) {
       const beats = phonicsBeats(words, true);
-      playBeats(beats, 0.8, () => {
+      playBeats(beats, 1, () => {
         setSpoken(words.length - 1);
         setActive(null);
         finishPlayback();
@@ -351,7 +370,7 @@ export function Reader() {
                     onTap={() => {
                       stopPlayback();
                       const beats = phonicsBeats([word], true).map((beat) => ({ ...beat, wordIndex }));
-                      playBeats(beats, 0.8, () => {
+                      playBeats(beats, 1, () => {
                         setActive(null);
                         setSpoken(wordIndex);
                       });
@@ -397,7 +416,7 @@ export function Reader() {
                 if (playing && !phonicsRef.current) startPlayback();
               }}
             >
-              {phonics ? "0.8x" : `${rate.toFixed(1)}x`}
+              {phonics ? "1.0x" : `${rate.toFixed(1)}x`}
             </button>
             <button
               className={`tap rounded-full px-4 font-extrabold ${phonics ? "bg-persimmon text-white" : "bg-white/10 text-paper"}`}

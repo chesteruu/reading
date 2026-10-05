@@ -239,7 +239,7 @@ export function segmentToken(token: string): Grapheme[] {
 }
 
 export function phonemeUrl(id: string): string {
-  return `/phonemes/${id}.wav?v=4`;
+  return `/phonemes/${id}.mp3?v=5`;
 }
 
 export type PhonicsBeat = {
@@ -268,8 +268,8 @@ export function phonicsBeats(tokens: { word: string }[], decode: boolean): Phoni
     }
     const core = lettersOf(token.word);
     beats.push({
-      audio: core === "a" ? phonemeUrl("schwa") : null,
-      say: core === "a" ? null : core,
+      audio: `/voice/words/${core}.mp3?v=1`,
+      say: null,
       wordIndex,
       graphemeIndex: "all",
       letters: core,
