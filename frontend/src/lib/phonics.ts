@@ -8,37 +8,37 @@ export type Grapheme = {
   linkedTo?: number;
 };
 
-const SHORT: Record<string, string> = { a: "ah", e: "eh", i: "ih", o: "aw", u: "uh" };
+const SHORT: Record<string, string> = { a: "a", e: "e", i: "i", o: "o", u: "u" };
 const LONG: Record<string, string> = { a: "ay", e: "ee", i: "eye", o: "oh", u: "yoo" };
 const CONSONANT: Record<string, string> = {
-  b: "buh",
-  c: "kuh",
-  d: "duh",
-  f: "fff",
-  g: "guh",
-  h: "hhh",
-  j: "juh",
-  k: "kuh",
-  l: "lll",
-  m: "mmm",
-  n: "nnn",
-  p: "puh",
-  q: "kuh",
-  r: "rrr",
-  s: "sss",
-  t: "tuh",
-  v: "vvv",
-  w: "wuh",
-  x: "ks",
-  y: "yuh",
-  z: "zzz",
+  b: "b",
+  c: "k",
+  d: "d",
+  f: "f",
+  g: "g",
+  h: "h",
+  j: "j",
+  k: "k",
+  l: "l",
+  m: "m",
+  n: "n",
+  p: "p",
+  q: "k",
+  r: "r",
+  s: "s",
+  t: "t",
+  v: "v",
+  w: "w",
+  x: "x",
+  y: "y",
+  z: "z",
 };
 
 const CHUNK_SPEAK: Record<string, { speak: string; kind: GraphemeKind }> = {
   igh: { speak: "eye", kind: "vowel" },
   air: { speak: "air", kind: "vowel" },
-  ear: { speak: "eer", kind: "vowel" },
-  eer: { speak: "eer", kind: "vowel" },
+  ear: { speak: "ee", kind: "vowel" },
+  eer: { speak: "ee", kind: "vowel" },
   oor: { speak: "or", kind: "vowel" },
   all: { speak: "all", kind: "vowel" },
   oa: { speak: "oh", kind: "vowel" },
@@ -53,25 +53,25 @@ const CHUNK_SPEAK: Record<string, { speak: string; kind: GraphemeKind }> = {
   ea: { speak: "ee", kind: "vowel" },
   ie: { speak: "ee", kind: "vowel" },
   ey: { speak: "ay", kind: "vowel" },
-  ue: { speak: "oo", kind: "vowel" },
-  ew: { speak: "oo", kind: "vowel" },
-  aw: { speak: "aw", kind: "vowel" },
-  au: { speak: "aw", kind: "vowel" },
+  ue: { speak: "ooh", kind: "vowel" },
+  ew: { speak: "ooh", kind: "vowel" },
+  aw: { speak: "or", kind: "vowel" },
+  au: { speak: "or", kind: "vowel" },
   ar: { speak: "ar", kind: "vowel" },
   or: { speak: "or", kind: "vowel" },
   er: { speak: "er", kind: "vowel" },
   ir: { speak: "er", kind: "vowel" },
   ur: { speak: "er", kind: "vowel" },
-  sh: { speak: "shh", kind: "consonant" },
+  sh: { speak: "sh", kind: "consonant" },
   ch: { speak: "ch", kind: "consonant" },
   th: { speak: "th", kind: "consonant" },
-  wh: { speak: "wuh", kind: "consonant" },
-  ph: { speak: "fff", kind: "consonant" },
-  ck: { speak: "kuh", kind: "consonant" },
+  wh: { speak: "w", kind: "consonant" },
+  ph: { speak: "f", kind: "consonant" },
+  ck: { speak: "k", kind: "consonant" },
   ng: { speak: "ng", kind: "consonant" },
-  qu: { speak: "kwuh", kind: "consonant" },
-  kn: { speak: "nnn", kind: "consonant" },
-  wr: { speak: "rrr", kind: "consonant" },
+  qu: { speak: "qu", kind: "consonant" },
+  kn: { speak: "n", kind: "consonant" },
+  wr: { speak: "r", kind: "consonant" },
 };
 
 const BLENDS = ["str", "spr", "scr", "bl", "br", "cl", "cr", "dr", "fl", "fr", "gl", "gr", "pl", "pr", "sc", "sk", "sl", "sm", "sn", "sp", "st", "sw", "tr", "tw"];
@@ -80,77 +80,68 @@ const DOUBLES = ["bb", "dd", "ff", "gg", "ll", "mm", "nn", "pp", "rr", "ss", "tt
 const CHUNKS = [...Object.keys(CHUNK_SPEAK), ...BLENDS, ...DOUBLES].sort((a, b) => b.length - a.length);
 
 const SHORT_OO = new Set(["look", "good", "book", "foot", "wood"]);
-const WORD_SAY: Record<string, string> = {
-  a: "uh",
-  the: "thuh",
-  to: "too",
-  of: "uv",
-  is: "iz",
-  by: "by",
-};
-
 const OVERRIDES: Record<string, Grapheme[]> = {
-  a: [{ text: "a", speak: "uh", kind: "vowel" }],
+  a: [{ text: "a", speak: "schwa", kind: "vowel" }],
   the: [
-    { text: "th", speak: "th", kind: "consonant" },
-    { text: "e", speak: "uh", kind: "vowel" },
+    { text: "th", speak: "dh", kind: "consonant" },
+    { text: "e", speak: "schwa", kind: "vowel" },
   ],
   to: [
-    { text: "t", speak: "tuh", kind: "consonant" },
+    { text: "t", speak: "t", kind: "consonant" },
     { text: "o", speak: "ooh", kind: "vowel" },
   ],
   of: [
-    { text: "o", speak: "uh", kind: "vowel" },
-    { text: "f", speak: "fff", kind: "consonant" },
+    { text: "o", speak: "schwa", kind: "vowel" },
+    { text: "f", speak: "f", kind: "consonant" },
   ],
   mia: [
-    { text: "m", speak: "mmm", kind: "consonant" },
+    { text: "m", speak: "m", kind: "consonant" },
     { text: "i", speak: "ee", kind: "vowel" },
-    { text: "a", speak: "uh", kind: "vowel" },
+    { text: "a", speak: "schwa", kind: "vowel" },
   ],
   gold: [
-    { text: "g", speak: "guh", kind: "consonant" },
+    { text: "g", speak: "g", kind: "consonant" },
     { text: "o", speak: "oh", kind: "vowel" },
-    { text: "l", speak: "lll", kind: "consonant" },
-    { text: "d", speak: "duh", kind: "consonant" },
+    { text: "l", speak: "l", kind: "consonant" },
+    { text: "d", speak: "d", kind: "consonant" },
   ],
   mango: [
-    { text: "m", speak: "mmm", kind: "consonant" },
-    { text: "a", speak: "ah", kind: "vowel" },
+    { text: "m", speak: "m", kind: "consonant" },
+    { text: "a", speak: "a", kind: "vowel" },
     { text: "ng", speak: "ng", kind: "consonant" },
     { text: "o", speak: "oh", kind: "vowel" },
   ],
   paper: [
-    { text: "p", speak: "puh", kind: "consonant" },
+    { text: "p", speak: "p", kind: "consonant" },
     { text: "a", speak: "ay", kind: "vowel" },
-    { text: "p", speak: "puh", kind: "consonant" },
+    { text: "p", speak: "p", kind: "consonant" },
     { text: "er", speak: "er", kind: "vowel" },
   ],
   walk: [
-    { text: "w", speak: "wuh", kind: "consonant" },
+    { text: "w", speak: "w", kind: "consonant" },
     { text: "al", speak: "all", kind: "vowel" },
-    { text: "k", speak: "kuh", kind: "consonant" },
+    { text: "k", speak: "k", kind: "consonant" },
   ],
   warm: [
-    { text: "w", speak: "wuh", kind: "consonant" },
+    { text: "w", speak: "w", kind: "consonant" },
     { text: "ar", speak: "or", kind: "vowel" },
-    { text: "m", speak: "mmm", kind: "consonant" },
+    { text: "m", speak: "m", kind: "consonant" },
   ],
   share: [
-    { text: "sh", speak: "shh", kind: "consonant" },
+    { text: "sh", speak: "sh", kind: "consonant" },
     { text: "are", speak: "air", kind: "vowel" },
   ],
   full: [
-    { text: "f", speak: "fff", kind: "consonant" },
-    { text: "u", speak: "uuh", kind: "vowel" },
-    { text: "ll", speak: "lll", kind: "consonant" },
+    { text: "f", speak: "f", kind: "consonant" },
+    { text: "u", speak: "uu", kind: "vowel" },
+    { text: "ll", speak: "l", kind: "consonant" },
   ],
   opens: [
     { text: "o", speak: "oh", kind: "vowel" },
-    { text: "p", speak: "puh", kind: "consonant" },
-    { text: "e", speak: "eh", kind: "vowel" },
-    { text: "n", speak: "nnn", kind: "consonant" },
-    { text: "s", speak: "sss", kind: "consonant" },
+    { text: "p", speak: "p", kind: "consonant" },
+    { text: "e", speak: "e", kind: "vowel" },
+    { text: "n", speak: "n", kind: "consonant" },
+    { text: "s", speak: "s", kind: "consonant" },
   ],
 };
 
@@ -166,7 +157,7 @@ function chunkOf(text: string, word: string): Grapheme {
   }
   const known = CHUNK_SPEAK[text];
   if (!known) return { text, speak: text, kind: "consonant" };
-  if (text === "oo" && SHORT_OO.has(word)) return { text, speak: "uuh", kind: "vowel" };
+  if (text === "oo" && SHORT_OO.has(word)) return { text, speak: "uu", kind: "vowel" };
   return { text, speak: known.speak, kind: known.kind };
 }
 
@@ -183,7 +174,7 @@ function segmentStem(word: string): Grapheme[] {
       break;
     }
     if (rest === "le") {
-      out.push({ text: "le", speak: "ul", kind: "vowel" });
+      out.push({ text: "le", speak: "le", kind: "vowel" });
       break;
     }
     const chunk = CHUNKS.find((item) => rest.startsWith(item));
@@ -234,7 +225,7 @@ export function segmentToken(token: string): Grapheme[] {
   let stem = core;
   let suffix: Grapheme | null = null;
   if (stem.length > 3 && stem.endsWith("s") && !stem.endsWith("ss")) {
-    suffix = { text: "s", speak: "sss", kind: "consonant" };
+    suffix = { text: "s", speak: "s", kind: "consonant" };
     stem = stem.slice(0, -1);
   }
   const graphs = segmentStem(stem);
@@ -247,13 +238,13 @@ export function segmentToken(token: string): Grapheme[] {
   return graphs;
 }
 
-export function blendOf(token: string): string {
-  const core = lettersOf(token);
-  return WORD_SAY[core] ?? core;
+export function phonemeUrl(id: string): string {
+  return `/phonemes/${id}.wav`;
 }
 
 export type PhonicsBeat = {
-  speak: string;
+  audio: string | null;
+  say: string | null;
   wordIndex: number;
   graphemeIndex: number | "all";
   letters: string;
@@ -267,18 +258,21 @@ export function phonicsBeats(tokens: { word: string }[], decode: boolean): Phoni
       graphs.forEach((graph, graphemeIndex) => {
         if (!graph.speak) return;
         beats.push({
-          speak: graph.speak,
+          audio: phonemeUrl(graph.speak),
+          say: null,
           wordIndex,
           graphemeIndex,
           letters: graph.text,
         });
       });
     }
+    const core = lettersOf(token.word);
     beats.push({
-      speak: blendOf(token.word),
+      audio: core === "a" ? phonemeUrl("schwa") : null,
+      say: core === "a" ? null : core,
       wordIndex,
       graphemeIndex: "all",
-      letters: lettersOf(token.word),
+      letters: core,
     });
   });
   return beats;

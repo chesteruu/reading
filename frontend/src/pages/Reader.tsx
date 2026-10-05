@@ -3,7 +3,7 @@ import { useNavigate, useParams } from "react-router-dom";
 import { api, ApiError } from "../api";
 import { useAuth } from "../auth";
 import { phonicsBeats, segmentToken, type PhonicsBeat } from "../lib/phonics";
-import { glossKey, softTick, speakAligned, stopSpeaking } from "../lib/speech";
+import { glossKey, playSounds, softTick, stopSpeaking } from "../lib/speech";
 import type { AlignmentWord, BookDetail, Gloss, Page } from "../types";
 
 type Bubble = { word: string; gloss?: Gloss; x: number; y: number };
@@ -22,7 +22,7 @@ export function Reader() {
   const [phonics, setPhonics] = useState(true);
   const [active, setActive] = useState<number | null>(null);
   const [graph, setGraph] = useState<number | "all" | null>(null);
-  const [cue, setCue] = useState<{ letters: string; speak: string } | null>(null);
+  const [cue, setCue] = useState<string | null>(null);
   const [spoken, setSpoken] = useState(-1);
   const [turn, setTurn] = useState<"next" | "prev" | null>(null);
   const [favorites, setFavorites] = useState<Set<string>>(new Set());
@@ -180,14 +180,14 @@ export function Reader() {
   }
 
   function playBeats(beats: PhonicsBeat[], speed: number, onDone: () => void) {
-    speakAligned(
-      beats.map((beat) => ({ word: beat.speak })),
+    playSounds(
+      beats.map((beat) => ({ audio: beat.audio, say: beat.say })),
       speed,
       (beatIndex) => {
         const beat = beats[beatIndex];
         setActive(beat.wordIndex);
         setGraph(beat.graphemeIndex);
-        setCue(beat.graphemeIndex === "all" ? null : { letters: beat.letters, speak: beat.speak });
+        setCue(beat.graphemeIndex === "all" ? null : beat.letters);
         setSpoken(beat.graphemeIndex === "all" ? beat.wordIndex : beat.wordIndex - 1);
       },
       () => {
@@ -349,8 +349,7 @@ export function Reader() {
             </div>
             {cue ? (
               <p className="phonics-cue">
-                <span>{cue.letters}</span>
-                <span>读作 {cue.speak}</span>
+                <span>{cue}</span>
               </p>
             ) : (
               <p className="phonics-cue is-idle">橙色是元音。拼读会先拆开，再把整个词连起来。</p>

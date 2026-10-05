@@ -16,6 +16,7 @@ export function prepareVoices(): void {
 
 let speechGeneration = 0;
 let speechTimer = 0;
+let clip: HTMLAudioElement | null = null;
 
 function say(text: string, rate: number): SpeechSynthesisUtterance {
   const utterance = new SpeechSynthesisUtterance(text);
@@ -89,10 +90,75 @@ export function speakAligned(
   }, 40);
 }
 
+export type SoundCue = { audio: string | null; say: string | null };
+
+export function playSounds(cues: SoundCue[], rate: number, onCue: (index: number) => void, onEnd: () => void): void {
+  if (cues.length === 0) {
+    onEnd();
+    return;
+  }
+  const run = ++speechGeneration;
+  window.clearTimeout(speechTimer);
+  window.speechSynthesis?.cancel();
+  clip?.pause();
+  let index = 0;
+  let ended = false;
+  const finish = () => {
+    if (ended || run !== speechGeneration) return;
+    ended = true;
+    onEnd();
+  };
+  const step = () => {
+    if (run !== speechGeneration) return;
+    if (index >= cues.length) {
+      finish();
+      return;
+    }
+    const cue = cues[index];
+    onCue(index);
+    if (cue.audio) {
+      const audio = new Audio(cue.audio);
+      clip = audio;
+      audio.preservesPitch = true;
+      const safari = audio as HTMLAudioElement & { webkitPreservesPitch?: boolean };
+      safari.webkitPreservesPitch = true;
+      audio.playbackRate = rate;
+      const advance = () => {
+        if (run !== speechGeneration) return;
+        index += 1;
+        step();
+      };
+      audio.onended = advance;
+      audio.onerror = advance;
+      void audio.play().catch(advance);
+      return;
+    }
+    const utterance = say(cue.say || "", rate);
+    const advance = () => {
+      if (run !== speechGeneration) return;
+      index += 1;
+      step();
+    };
+    utterance.onend = advance;
+    utterance.onerror = (event) => {
+      if (event.error === "interrupted" || event.error === "canceled") return;
+      advance();
+    };
+    window.speechSynthesis.speak(utterance);
+  };
+  speechTimer = window.setTimeout(step, 30);
+}
+
 export function stopSpeaking(): void {
   speechGeneration += 1;
   window.clearTimeout(speechTimer);
   window.speechSynthesis?.cancel();
+  if (clip) {
+    clip.onended = null;
+    clip.onerror = null;
+    clip.pause();
+    clip = null;
+  }
 }
 
 export function pageText(words: { word: string }[]): string {
