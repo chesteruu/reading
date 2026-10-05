@@ -37,6 +37,53 @@ function spokenWord(word: string): string {
   return cleaned || word;
 }
 
+function beginUtterance(
+  text: string,
+  rate: number,
+  run: number,
+  hooks: {
+    onstart?: () => void;
+    onend: () => void;
+    onboundary?: (event: SpeechSynthesisEvent) => void;
+  },
+): void {
+  let started = false;
+  let finished = false;
+  let attempts = 0;
+  const finish = () => {
+    if (finished || run !== speechGeneration) return;
+    finished = true;
+    hooks.onend();
+  };
+  const attempt = () => {
+    if (finished || run !== speechGeneration) return;
+    attempts += 1;
+    const utterance = say(text, attempts === 1 ? rate : 1);
+    utterance.onstart = () => {
+      started = true;
+      hooks.onstart?.();
+    };
+    if (hooks.onboundary) utterance.onboundary = hooks.onboundary;
+    utterance.onend = finish;
+    utterance.onerror = (event) => {
+      if (finished || run !== speechGeneration) return;
+      if (!started && attempts < 3) {
+        window.speechSynthesis.resume();
+        window.setTimeout(attempt, 80);
+        return;
+      }
+      if (event.error === "interrupted" || event.error === "canceled") return;
+      finish();
+    };
+    window.speechSynthesis.resume();
+    window.speechSynthesis.speak(utterance);
+  };
+  attempt();
+  window.setTimeout(() => {
+    if (!started && !finished && attempts < 3 && run === speechGeneration) attempt();
+  }, 450);
+}
+
 export function speak(text: string, rate = 1): void {
   if (!("speechSynthesis" in window) || !text.trim()) return;
   const run = ++speechGeneration;
@@ -44,9 +91,8 @@ export function speak(text: string, rate = 1): void {
   window.speechSynthesis.cancel();
   speechTimer = window.setTimeout(() => {
     if (run !== speechGeneration) return;
-    if (window.speechSynthesis.paused) window.speechSynthesis.resume();
-    window.speechSynthesis.speak(say(text, rate));
-  }, 40);
+    beginUtterance(text, rate, run, { onend: () => undefined });
+  }, 80);
 }
 
 /** One sentence, one voice, so the intonation stays natural. */
@@ -73,26 +119,22 @@ export function speakNaturally(
   clip?.pause();
   speechTimer = window.setTimeout(() => {
     if (run !== speechGeneration) return;
-    if (window.speechSynthesis.paused) window.speechSynthesis.resume();
-    const utterance = say(text, rate);
-    utterance.onboundary = (event) => {
-      if (run !== speechGeneration) return;
-      if (event.name && event.name !== "word") return;
-      const at = event.charIndex ?? 0;
-      let index = spans.findIndex((span) => at >= span.start && at < span.end);
-      if (index < 0) index = spans.findIndex((span) => at <= span.start);
-      if (index < 0) index = spans.length - 1;
-      onWord(index);
-    };
-    utterance.onend = () => {
-      if (run === speechGeneration) onEnd();
-    };
-    utterance.onerror = (event) => {
-      if (event.error === "interrupted" || event.error === "canceled") return;
-      if (run === speechGeneration) onEnd();
-    };
-    window.speechSynthesis.speak(utterance);
-  }, 40);
+    beginUtterance(text, rate, run, {
+      onstart: () => onWord(0),
+      onboundary: (event) => {
+        if (run !== speechGeneration) return;
+        if (event.name && event.name !== "word") return;
+        const at = event.charIndex ?? 0;
+        let index = spans.findIndex((span) => at >= span.start && at < span.end);
+        if (index < 0) index = spans.findIndex((span) => at <= span.start);
+        if (index < 0) index = spans.length - 1;
+        onWord(index);
+      },
+      onend: () => {
+        if (run === speechGeneration) onEnd();
+      },
+    });
+  }, 80);
 }
 
 /**
@@ -186,18 +228,13 @@ export function playSounds(cues: SoundCue[], rate: number, onCue: (index: number
       void audio.play().catch(advance);
       return;
     }
-    const utterance = say(cue.say || "", rate);
-    const advance = () => {
-      if (run !== speechGeneration) return;
-      index += 1;
-      step();
-    };
-    utterance.onend = advance;
-    utterance.onerror = (event) => {
-      if (event.error === "interrupted" || event.error === "canceled") return;
-      advance();
-    };
-    window.speechSynthesis.speak(utterance);
+    beginUtterance(cue.say || "", rate, run, {
+      onend: () => {
+        if (run !== speechGeneration) return;
+        index += 1;
+        step();
+      },
+    });
   };
   speechTimer = window.setTimeout(step, 30);
 }
