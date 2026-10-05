@@ -17,7 +17,7 @@ export function Reader() {
   const [error, setError] = useState("");
   const [index, setIndex] = useState(0);
   const [mode, setMode] = useState<"listen" | "read">("listen");
-  const [rate, setRate] = useState<0.8 | 1>(1);
+  const [rate, setRate] = useState<0.5 | 0.8 | 1>(1);
   const [playing, setPlaying] = useState(false);
   const [phonics, setPhonics] = useState(false);
   const [active, setActive] = useState<number | null>(null);
@@ -201,7 +201,7 @@ export function Reader() {
   function speakSentence(words: AlignmentWord[], speed: number) {
     if (phonicsRef.current) {
       const beats = phonicsBeats(words, true);
-      playBeats(beats, 0.5, () => {
+      playBeats(beats, 0.8, () => {
         setSpoken(words.length - 1);
         setActive(null);
         finishPlayback();
@@ -351,7 +351,7 @@ export function Reader() {
                     onTap={() => {
                       stopPlayback();
                       const beats = phonicsBeats([word], true).map((beat) => ({ ...beat, wordIndex }));
-                      playBeats(beats, 0.5, () => {
+                      playBeats(beats, 0.8, () => {
                         setActive(null);
                         setSpoken(wordIndex);
                       });
@@ -390,13 +390,14 @@ export function Reader() {
               type="button"
               disabled={phonics}
               onClick={() => {
-                const next = rate === 1 ? 0.8 : 1;
+                const steps = [1, 0.8, 0.5] as const;
+                const next = steps[(steps.indexOf(rate) + 1) % steps.length];
                 rateRef.current = next;
                 setRate(next);
                 if (playing && !phonicsRef.current) startPlayback();
               }}
             >
-              {phonics ? "0.5x" : `${rate === 1 ? "1.0" : "0.8"}x`}
+              {phonics ? "0.8x" : `${rate.toFixed(1)}x`}
             </button>
             <button
               className={`tap rounded-full px-4 font-extrabold ${phonics ? "bg-persimmon text-white" : "bg-white/10 text-paper"}`}
