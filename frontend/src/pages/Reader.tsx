@@ -3,7 +3,7 @@ import { useNavigate, useParams } from "react-router-dom";
 import { api, ApiError } from "../api";
 import { useAuth } from "../auth";
 import { phonicsBeats, segmentToken, type PhonicsBeat } from "../lib/phonics";
-import { glossKey, playSounds, softTick, stopSpeaking } from "../lib/speech";
+import { glossKey, playSounds, softTick, speakNaturally, stopSpeaking } from "../lib/speech";
 import type { AlignmentWord, BookDetail, Gloss, Page } from "../types";
 
 type Bubble = { word: string; gloss?: Gloss; x: number; y: number };
@@ -19,7 +19,7 @@ export function Reader() {
   const [mode, setMode] = useState<"listen" | "read">("listen");
   const [rate, setRate] = useState<0.8 | 1>(1);
   const [playing, setPlaying] = useState(false);
-  const [phonics, setPhonics] = useState(true);
+  const [phonics, setPhonics] = useState(false);
   const [active, setActive] = useState<number | null>(null);
   const [graph, setGraph] = useState<number | "all" | null>(null);
   const [cue, setCue] = useState<string | null>(null);
@@ -32,7 +32,7 @@ export function Reader() {
   const [autoAdvance, setAutoAdvance] = useState(true);
   const auto = useRef(true);
   auto.current = autoAdvance;
-  const phonicsRef = useRef(true);
+  const phonicsRef = useRef(false);
   phonicsRef.current = phonics;
   const modeRef = useRef(mode);
   const rateRef = useRef(rate);
@@ -199,12 +199,31 @@ export function Reader() {
   }
 
   function speakSentence(words: AlignmentWord[], speed: number) {
-    const beats = phonicsBeats(words, phonicsRef.current);
-    playBeats(beats, speed, () => {
-      setSpoken(words.length - 1);
-      setActive(null);
-      finishPlayback();
-    });
+    if (phonicsRef.current) {
+      const beats = phonicsBeats(words, true);
+      playBeats(beats, speed, () => {
+        setSpoken(words.length - 1);
+        setActive(null);
+        finishPlayback();
+      });
+      return;
+    }
+    speakNaturally(
+      words,
+      speed,
+      (wordIndex) => {
+        setActive(wordIndex);
+        setGraph("all");
+        setCue(null);
+        setSpoken(wordIndex - 1);
+      },
+      () => {
+        setSpoken(words.length - 1);
+        setActive(null);
+        setGraph(null);
+        finishPlayback();
+      },
+    );
   }
 
   useEffect(() => {
@@ -352,7 +371,7 @@ export function Reader() {
                 <span>{cue}</span>
               </p>
             ) : (
-              <p className="phonics-cue is-idle">橙色是元音。拼读会先拆开，再把整个词连起来。</p>
+              <p className="phonics-cue is-idle">播放按整句来读。点一个词，才会把这个词拆开拼读。</p>
             )}
           </div>
         </article>

@@ -239,7 +239,7 @@ export function segmentToken(token: string): Grapheme[] {
 }
 
 export function phonemeUrl(id: string): string {
-  return `/phonemes/${id}.wav`;
+  return `/phonemes/${id}.wav?v=4`;
 }
 
 export type PhonicsBeat = {

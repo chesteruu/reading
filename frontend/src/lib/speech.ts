@@ -43,6 +43,52 @@ export function speak(text: string, rate = 1): void {
   }, 40);
 }
 
+/** One sentence, one voice, so the intonation stays natural. */
+export function speakNaturally(
+  words: { word: string }[],
+  rate: number,
+  onWord: (index: number) => void,
+  onEnd: () => void,
+): void {
+  if (!("speechSynthesis" in window) || words.length === 0) {
+    onEnd();
+    return;
+  }
+  const text = words.map((item) => item.word).join(" ");
+  const spans: { start: number; end: number }[] = [];
+  let cursor = 0;
+  for (const item of words) {
+    spans.push({ start: cursor, end: cursor + item.word.length });
+    cursor += item.word.length + 1;
+  }
+  const run = ++speechGeneration;
+  window.clearTimeout(speechTimer);
+  window.speechSynthesis.cancel();
+  clip?.pause();
+  speechTimer = window.setTimeout(() => {
+    if (run !== speechGeneration) return;
+    if (window.speechSynthesis.paused) window.speechSynthesis.resume();
+    const utterance = say(text, rate);
+    utterance.onboundary = (event) => {
+      if (run !== speechGeneration) return;
+      if (event.name && event.name !== "word") return;
+      const at = event.charIndex ?? 0;
+      let index = spans.findIndex((span) => at >= span.start && at < span.end);
+      if (index < 0) index = spans.findIndex((span) => at <= span.start);
+      if (index < 0) index = spans.length - 1;
+      onWord(index);
+    };
+    utterance.onend = () => {
+      if (run === speechGeneration) onEnd();
+    };
+    utterance.onerror = (event) => {
+      if (event.error === "interrupted" || event.error === "canceled") return;
+      if (run === speechGeneration) onEnd();
+    };
+    window.speechSynthesis.speak(utterance);
+  }, 40);
+}
+
 /**
  * Highlight follows the voice. Each word is spoken on its own, and the gold
  * word changes only when that word actually starts, at whatever rate is set.

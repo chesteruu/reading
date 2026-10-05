@@ -8,7 +8,7 @@ from pathlib import Path
 OUT = Path(__file__).resolve().parents[1] / "frontend" / "public" / "phonemes"
 
 PHONEMES = {
-    "a": "a",
+    "a": "a:",
     "e": "E",
     "i": "I",
     "o": "0",
@@ -93,7 +93,7 @@ def main() -> None:
         items[blend] = " ".join(blend)
     for name, phoneme in items.items():
         target = OUT / f"{name}.wav"
-        subprocess.run(["espeak-ng", "-v", "en-us", "-w", str(target), f"[[{phoneme}]]"], check=True)
+        subprocess.run(["espeak-ng", "-v", "en-us+f3", "-w", str(target), f"[[{phoneme}]]"], check=True)
         trim_silence(target)
     print(f"wrote {len(items)} phoneme clips to {OUT}")
 
