@@ -18,10 +18,16 @@ let speechGeneration = 0;
 let speechTimer = 0;
 let clip: HTMLAudioElement | null = null;
 
+function speechRate(rate: number): number {
+  // Chrome speaks rate 1 slower than 0.8. Step off that broken value.
+  if (Math.abs(rate - 1) < 0.001) return 1.15;
+  return rate;
+}
+
 function say(text: string, rate: number): SpeechSynthesisUtterance {
   const utterance = new SpeechSynthesisUtterance(text);
   utterance.lang = "en-US";
-  utterance.rate = rate;
+  utterance.rate = speechRate(rate);
   if (voice) utterance.voice = voice;
   return utterance;
 }
@@ -168,6 +174,7 @@ export function playSounds(cues: SoundCue[], rate: number, onCue: (index: number
       audio.preservesPitch = true;
       const safari = audio as HTMLAudioElement & { webkitPreservesPitch?: boolean };
       safari.webkitPreservesPitch = true;
+      audio.defaultPlaybackRate = rate;
       audio.playbackRate = rate;
       const advance = () => {
         if (run !== speechGeneration) return;

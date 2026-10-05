@@ -201,7 +201,7 @@ export function Reader() {
   function speakSentence(words: AlignmentWord[], speed: number) {
     if (phonicsRef.current) {
       const beats = phonicsBeats(words, true);
-      playBeats(beats, speed, () => {
+      playBeats(beats, 0.5, () => {
         setSpoken(words.length - 1);
         setActive(null);
         finishPlayback();
@@ -351,7 +351,7 @@ export function Reader() {
                     onTap={() => {
                       stopPlayback();
                       const beats = phonicsBeats([word], true).map((beat) => ({ ...beat, wordIndex }));
-                      playBeats(beats, rateRef.current, () => {
+                      playBeats(beats, 0.5, () => {
                         setActive(null);
                         setSpoken(wordIndex);
                       });
@@ -386,16 +386,17 @@ export function Reader() {
               {playing ? "暂停" : "播放"}
             </button>
             <button
-              className="tap rounded-full bg-white/10 px-4 text-paper"
+              className="tap rounded-full bg-white/10 px-4 text-paper disabled:opacity-80"
               type="button"
+              disabled={phonics}
               onClick={() => {
                 const next = rate === 1 ? 0.8 : 1;
                 rateRef.current = next;
                 setRate(next);
-                if (playing) startPlayback();
+                if (playing && !phonicsRef.current) startPlayback();
               }}
             >
-              {rate.toFixed(1)}x
+              {phonics ? "0.5x" : `${rate === 1 ? "1.0" : "0.8"}x`}
             </button>
             <button
               className={`tap rounded-full px-4 font-extrabold ${phonics ? "bg-persimmon text-white" : "bg-white/10 text-paper"}`}
