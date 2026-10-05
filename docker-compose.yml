@@ -1,0 +1,40 @@
+services:
+  db:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_USER: reading
+      POSTGRES_PASSWORD: reading
+      POSTGRES_DB: reading
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U reading -d reading"]
+      interval: 3s
+      timeout: 5s
+      retries: 20
+
+  api:
+    build: ./backend
+    environment:
+      DATABASE_URL: postgresql+psycopg://reading:reading@db:5432/reading
+      UPLOAD_DIR: /data/uploads
+      JWT_PRIVATE_KEY_PATH: /data/keys/private.pem
+      JWT_PUBLIC_KEY_PATH: /data/keys/public.pem
+      CORS_ORIGINS: http://localhost:8080,http://127.0.0.1:8080
+      SEED_DEMO: "1"
+    volumes:
+      - apidata:/data
+    depends_on:
+      db:
+        condition: service_healthy
+
+  web:
+    build: ./frontend
+    ports:
+      - "8080:80"
+    depends_on:
+      - api
+
+volumes:
+  pgdata:
+  apidata:
