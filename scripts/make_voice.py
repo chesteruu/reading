@@ -20,10 +20,11 @@ WORD_DIR = PUBLIC / "voice" / "words"
 SENTENCE_DIR = PUBLIC / "voice" / "sentences"
 NARRATION_PATH = ROOT / "frontend" / "src" / "data" / "narration.json"
 
+# Keys are /phonemes/{key}.mp3 ids. Short /ɪ/ is "ih" (not letter-name "i").
 PHONEMES = {
     "a": "ah",
     "e": "eh",
-    "i": "ih",
+    "ih": "ih",
     "o": "aw",
     "u": "uh",
     "ay": "ay",
@@ -154,7 +155,7 @@ async def main() -> None:
         await synthesize(word, WORD_DIR / f"{word}.mp3")
     print("words", len(words))
 
-    vowels = {"a", "e", "i", "o", "u", "ay", "ee", "eye", "oh", "yoo", "uu", "ooh", "ar", "er", "or", "air", "ow", "oy", "schwa", "le", "all"}
+    vowels = {"a", "e", "ih", "o", "u", "ay", "ee", "eye", "oh", "yoo", "uu", "ooh", "ar", "er", "or", "air", "ow", "oy", "schwa", "le", "all"}
     for name, prompt in {**PHONEMES, **BLENDS}.items():
         target = PHONEME_DIR / f"{name}.mp3"
         await synthesize(prompt, target)
@@ -162,6 +163,9 @@ async def main() -> None:
             trimmed = target.with_suffix(".trim.mp3")
             subprocess_trim(target, trimmed)
             trimmed.replace(target)
+    # Legacy alias so old clients asking for i.mp3 still get short /ɪ/.
+    legacy = PHONEME_DIR / "i.mp3"
+    legacy.write_bytes((PHONEME_DIR / "ih.mp3").read_bytes())
     for old in PHONEME_DIR.glob("*.wav"):
         old.unlink()
     print("phonemes", len(PHONEMES))

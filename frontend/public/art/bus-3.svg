@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 800" width="600" height="800"><rect width="600" height="800" fill="#f1e5cc"/><rect x="24" y="24" width="552" height="752" fill="none" stroke="#f7f1e6" stroke-width="4" opacity=".35"/><circle cx="300" cy="360" r="190" fill="#fff8ef"/>
+    <circle cx="180" cy="430" r="34" fill="#f0c9a0"/><rect x="160" y="464" width="40" height="70" fill="#2f6f4e"/>
+    <circle cx="250" cy="430" r="34" fill="#f0c9a0"/><rect x="230" y="464" width="40" height="70" fill="#d3543c"/>
+    <path d="M290 400 Q320 380 340 400" stroke="#2b2118" stroke-width="5" fill="none"/>
+    <g transform="translate(430 430) scale(.72)">
+      <rect x="-140" y="-40" width="280" height="110" rx="18" fill="#f0c14e"/>
+      <rect x="-120" y="-70" width="160" height="40" rx="10" fill="#f0c14e"/>
+      <rect x="-105" y="-58" width="40" height="28" fill="#9ad0e8"/>
+      <rect x="-55" y="-58" width="40" height="28" fill="#9ad0e8"/>
+      <rect x="-5" y="-58" width="40" height="28" fill="#9ad0e8"/>
+      <circle cx="-80" cy="70" r="28" fill="#2b2118"/>
+      <circle cx="80" cy="70" r="28" fill="#2b2118"/>
+    </g>
+</svg>

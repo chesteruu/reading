@@ -618,5 +618,550 @@
         "end": 1.625
       }
     ]
+  },
+  "pat the fat cat": {
+    "url": "/voice/sentences/s19.mp3",
+    "words": [
+      {
+        "word": "Pat",
+        "start": 0.1,
+        "end": 0.35
+      },
+      {
+        "word": "the",
+        "start": 0.362,
+        "end": 0.45
+      },
+      {
+        "word": "fat",
+        "start": 0.463,
+        "end": 0.762
+      },
+      {
+        "word": "cat",
+        "start": 0.775,
+        "end": 1.288
+      }
+    ]
+  },
+  "the cat is on the mat": {
+    "url": "/voice/sentences/s20.mp3",
+    "words": [
+      {
+        "word": "The",
+        "start": 0.1,
+        "end": 0.238
+      },
+      {
+        "word": "cat",
+        "start": 0.25,
+        "end": 0.537
+      },
+      {
+        "word": "is",
+        "start": 0.55,
+        "end": 0.663
+      },
+      {
+        "word": "on",
+        "start": 0.675,
+        "end": 0.825
+      },
+      {
+        "word": "the",
+        "start": 0.838,
+        "end": 0.912
+      },
+      {
+        "word": "mat",
+        "start": 0.925,
+        "end": 1.4
+      }
+    ]
+  },
+  "the cat has a nap": {
+    "url": "/voice/sentences/s21.mp3",
+    "words": [
+      {
+        "word": "The",
+        "start": 0.1,
+        "end": 0.238
+      },
+      {
+        "word": "cat",
+        "start": 0.25,
+        "end": 0.55
+      },
+      {
+        "word": "has",
+        "start": 0.562,
+        "end": 0.738
+      },
+      {
+        "word": "a",
+        "start": 0.75,
+        "end": 0.8
+      },
+      {
+        "word": "nap",
+        "start": 0.812,
+        "end": 1.262
+      }
+    ]
+  },
+  "the cat wants milk": {
+    "url": "/voice/sentences/s22.mp3",
+    "words": [
+      {
+        "word": "The",
+        "start": 0.1,
+        "end": 0.225
+      },
+      {
+        "word": "cat",
+        "start": 0.237,
+        "end": 0.55
+      },
+      {
+        "word": "wants",
+        "start": 0.562,
+        "end": 0.825
+      },
+      {
+        "word": "milk",
+        "start": 0.838,
+        "end": 1.288
+      }
+    ]
+  },
+  "the cat sits on my lap": {
+    "url": "/voice/sentences/s23.mp3",
+    "words": [
+      {
+        "word": "The",
+        "start": 0.1,
+        "end": 0.238
+      },
+      {
+        "word": "cat",
+        "start": 0.25,
+        "end": 0.588
+      },
+      {
+        "word": "sits",
+        "start": 0.6,
+        "end": 0.837
+      },
+      {
+        "word": "on",
+        "start": 0.85,
+        "end": 0.963
+      },
+      {
+        "word": "my",
+        "start": 0.975,
+        "end": 1.1
+      },
+      {
+        "word": "lap",
+        "start": 1.113,
+        "end": 1.55
+      }
+    ]
+  },
+  "i hear the cat purr": {
+    "url": "/voice/sentences/s24.mp3",
+    "words": [
+      {
+        "word": "I",
+        "start": 0.1,
+        "end": 0.225
+      },
+      {
+        "word": "hear",
+        "start": 0.237,
+        "end": 0.438
+      },
+      {
+        "word": "the",
+        "start": 0.45,
+        "end": 0.537
+      },
+      {
+        "word": "cat",
+        "start": 0.55,
+        "end": 0.85
+      },
+      {
+        "word": "purr",
+        "start": 0.863,
+        "end": 1.275
+      }
+    ]
+  },
+  "rain taps on the roof": {
+    "url": "/voice/sentences/s25.mp3",
+    "words": [
+      {
+        "word": "Rain",
+        "start": 0.1,
+        "end": 0.387
+      },
+      {
+        "word": "taps",
+        "start": 0.4,
+        "end": 0.7
+      },
+      {
+        "word": "on",
+        "start": 0.713,
+        "end": 0.825
+      },
+      {
+        "word": "the",
+        "start": 0.838,
+        "end": 0.938
+      },
+      {
+        "word": "roof",
+        "start": 0.95,
+        "end": 1.425
+      }
+    ]
+  },
+  "i see drops on the glass": {
+    "url": "/voice/sentences/s26.mp3",
+    "words": [
+      {
+        "word": "I",
+        "start": 0.1,
+        "end": 0.238
+      },
+      {
+        "word": "see",
+        "start": 0.25,
+        "end": 0.438
+      },
+      {
+        "word": "drops",
+        "start": 0.45,
+        "end": 0.8
+      },
+      {
+        "word": "on",
+        "start": 0.812,
+        "end": 0.925
+      },
+      {
+        "word": "the",
+        "start": 0.938,
+        "end": 1.025
+      },
+      {
+        "word": "glass",
+        "start": 1.038,
+        "end": 1.638
+      }
+    ]
+  },
+  "i put on my boots": {
+    "url": "/voice/sentences/s27.mp3",
+    "words": [
+      {
+        "word": "I",
+        "start": 0.1,
+        "end": 0.225
+      },
+      {
+        "word": "put",
+        "start": 0.237,
+        "end": 0.438
+      },
+      {
+        "word": "on",
+        "start": 0.45,
+        "end": 0.55
+      },
+      {
+        "word": "my",
+        "start": 0.562,
+        "end": 0.688
+      },
+      {
+        "word": "boots",
+        "start": 0.7,
+        "end": 1.25
+      }
+    ]
+  },
+  "we jump in a puddle": {
+    "url": "/voice/sentences/s28.mp3",
+    "words": [
+      {
+        "word": "We",
+        "start": 0.1,
+        "end": 0.263
+      },
+      {
+        "word": "jump",
+        "start": 0.275,
+        "end": 0.538
+      },
+      {
+        "word": "in",
+        "start": 0.55,
+        "end": 0.638
+      },
+      {
+        "word": "a",
+        "start": 0.65,
+        "end": 0.7
+      },
+      {
+        "word": "puddle",
+        "start": 0.713,
+        "end": 1.212
+      }
+    ]
+  },
+  "splash my coat is wet": {
+    "url": "/voice/sentences/s29.mp3",
+    "words": [
+      {
+        "word": "Splash",
+        "start": 0.1,
+        "end": 0.787
+      },
+      {
+        "word": "My",
+        "start": 1.65,
+        "end": 1.837
+      },
+      {
+        "word": "coat",
+        "start": 1.85,
+        "end": 2.113
+      },
+      {
+        "word": "is",
+        "start": 2.125,
+        "end": 2.263
+      },
+      {
+        "word": "wet",
+        "start": 2.275,
+        "end": 2.725
+      }
+    ]
+  },
+  "then the cloud drifts by": {
+    "url": "/voice/sentences/s30.mp3",
+    "words": [
+      {
+        "word": "Then",
+        "start": 0.1,
+        "end": 0.287
+      },
+      {
+        "word": "the",
+        "start": 0.3,
+        "end": 0.4
+      },
+      {
+        "word": "cloud",
+        "start": 0.412,
+        "end": 0.712
+      },
+      {
+        "word": "drifts",
+        "start": 0.725,
+        "end": 1.038
+      },
+      {
+        "word": "by",
+        "start": 1.05,
+        "end": 1.438
+      }
+    ]
+  },
+  "here comes the yellow bus": {
+    "url": "/voice/sentences/s31.mp3",
+    "words": [
+      {
+        "word": "Here",
+        "start": 0.1,
+        "end": 0.35
+      },
+      {
+        "word": "comes",
+        "start": 0.362,
+        "end": 0.613
+      },
+      {
+        "word": "the",
+        "start": 0.625,
+        "end": 0.7
+      },
+      {
+        "word": "yellow",
+        "start": 0.713,
+        "end": 1.012
+      },
+      {
+        "word": "bus",
+        "start": 1.025,
+        "end": 1.55
+      }
+    ]
+  },
+  "the bus stops at my gate": {
+    "url": "/voice/sentences/s32.mp3",
+    "words": [
+      {
+        "word": "The",
+        "start": 0.1,
+        "end": 0.25
+      },
+      {
+        "word": "bus",
+        "start": 0.263,
+        "end": 0.5
+      },
+      {
+        "word": "stops",
+        "start": 0.512,
+        "end": 0.862
+      },
+      {
+        "word": "at",
+        "start": 0.875,
+        "end": 0.95
+      },
+      {
+        "word": "my",
+        "start": 0.963,
+        "end": 1.1
+      },
+      {
+        "word": "gate",
+        "start": 1.113,
+        "end": 1.6
+      }
+    ]
+  },
+  "my friends wave to me": {
+    "url": "/voice/sentences/s33.mp3",
+    "words": [
+      {
+        "word": "My",
+        "start": 0.1,
+        "end": 0.287
+      },
+      {
+        "word": "friends",
+        "start": 0.3,
+        "end": 0.637
+      },
+      {
+        "word": "wave",
+        "start": 0.65,
+        "end": 0.887
+      },
+      {
+        "word": "to",
+        "start": 0.9,
+        "end": 1.025
+      },
+      {
+        "word": "me",
+        "start": 1.038,
+        "end": 1.35
+      }
+    ]
+  },
+  "we sit and chat": {
+    "url": "/voice/sentences/s34.mp3",
+    "words": [
+      {
+        "word": "We",
+        "start": 0.1,
+        "end": 0.263
+      },
+      {
+        "word": "sit",
+        "start": 0.275,
+        "end": 0.512
+      },
+      {
+        "word": "and",
+        "start": 0.525,
+        "end": 0.65
+      },
+      {
+        "word": "chat",
+        "start": 0.662,
+        "end": 1.175
+      }
+    ]
+  },
+  "the bus rolls to school": {
+    "url": "/voice/sentences/s35.mp3",
+    "words": [
+      {
+        "word": "The",
+        "start": 0.1,
+        "end": 0.238
+      },
+      {
+        "word": "bus",
+        "start": 0.25,
+        "end": 0.537
+      },
+      {
+        "word": "rolls",
+        "start": 0.55,
+        "end": 0.825
+      },
+      {
+        "word": "to",
+        "start": 0.838,
+        "end": 0.938
+      },
+      {
+        "word": "school",
+        "start": 0.95,
+        "end": 1.487
+      }
+    ]
+  },
+  "the bell rings we learn": {
+    "url": "/voice/sentences/s36.mp3",
+    "words": [
+      {
+        "word": "The",
+        "start": 0.1,
+        "end": 0.25
+      },
+      {
+        "word": "bell",
+        "start": 0.263,
+        "end": 0.512
+      },
+      {
+        "word": "rings",
+        "start": 0.525,
+        "end": 1.075
+      },
+      {
+        "word": "We",
+        "start": 1.938,
+        "end": 2.125
+      },
+      {
+        "word": "learn",
+        "start": 2.138,
+        "end": 2.6
+      }
+    ]
   }
 }

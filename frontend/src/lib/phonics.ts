@@ -8,7 +8,8 @@ export type Grapheme = {
   linkedTo?: number;
 };
 
-const SHORT: Record<string, string> = { a: "a", e: "e", i: "i", o: "o", u: "u" };
+/** Clip ids under /phonemes — short i must be "ih" (/ɪ/), never letter-name "i" (/aɪ/). */
+const SHORT: Record<string, string> = { a: "a", e: "e", i: "ih", o: "o", u: "u" };
 const LONG: Record<string, string> = { a: "ay", e: "ee", i: "eye", o: "oh", u: "yoo" };
 const CONSONANT: Record<string, string> = {
   b: "b",
@@ -239,7 +240,7 @@ export function segmentToken(token: string): Grapheme[] {
 }
 
 export function phonemeUrl(id: string): string {
-  return `/phonemes/${id}.mp3?v=5`;
+  return `/phonemes/${id}.mp3?v=6`;
 }
 
 export type PhonicsBeat = {

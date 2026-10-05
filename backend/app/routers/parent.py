@@ -16,6 +16,7 @@ from app.models import (
     WordEvent,
     utcnow,
 )
+from app.packs import COVERS, GENRES, all_packs
 from app.scoring import align_sentence
 from app.services import new_id
 
@@ -66,6 +67,11 @@ def _auto_activities(pages: list[dict]) -> dict:
             "pairs": [{"id": word, "word": word, "emoji": "⭐"} for word in words],
         },
     }
+
+
+@router.get("/packs")
+def list_packs(principal: dict = Depends(require_parent)) -> dict:
+    return {"packs": all_packs(), "covers": COVERS, "genres": GENRES}
 
 
 @router.get("/overview")

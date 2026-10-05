@@ -6,45 +6,11 @@ from app.models import Book, BookPage, ChildProfile, User, utcnow
 from app.security import hash_secret
 
 
-def seed_demo(db: Session) -> None:
-    if db.get(User, PARENT_ID):
-        return
-    db.add(
-        User(
-            id=PARENT_ID,
-            email="demo@reading.app",
-            hashed_password=hash_secret("demo1234"),
-            role="parent",
-            created_at=utcnow(),
-        )
-    )
-    # Parent row must exist before child profiles. Ordering is explicit because
-    # these models link with foreign keys rather than ORM relationships.
-    db.flush()
-    db.add(
-        ChildProfile(
-            id=LUNA_ID,
-            parent_id=PARENT_ID,
-            nickname="Luna",
-            avatar_url="/avatars/moon.svg",
-            pin_hash=hash_secret("1234"),
-            current_level="E",
-            star_balance=0,
-        )
-    )
-    db.add(
-        ChildProfile(
-            id=LEO_ID,
-            parent_id=PARENT_ID,
-            nickname="Leo",
-            avatar_url="/avatars/lion.svg",
-            pin_hash=hash_secret("2580"),
-            current_level="D",
-            star_balance=0,
-        )
-    )
-    stories = list(CATALOG)
-    for story in stories:
+def _upsert_catalog(db: Session) -> None:
+    """Ensure every catalog story exists even on already-seeded databases."""
+    for story in CATALOG:
+        if db.get(Book, story["id"]):
+            continue
         pages = story["pages"]
         db.add(
             Book(
@@ -63,10 +29,10 @@ def seed_demo(db: Session) -> None:
                 created_at=utcnow(),
             )
         )
-    db.flush()
-    for story in stories:
-        pages = story["pages"]
+        db.flush()
         for page in pages:
+            if db.get(BookPage, page["id"]):
+                continue
             db.add(
                 BookPage(
                     id=page["id"],
@@ -77,6 +43,45 @@ def seed_demo(db: Session) -> None:
                     alignment_data=page["alignment_data"],
                 )
             )
+
+
+def seed_demo(db: Session) -> None:
+    if not db.get(User, PARENT_ID):
+        db.add(
+            User(
+                id=PARENT_ID,
+                email="demo@reading.app",
+                hashed_password=hash_secret("demo1234"),
+                role="parent",
+                created_at=utcnow(),
+            )
+        )
+        # Parent row must exist before child profiles. Ordering is explicit because
+        # these models link with foreign keys rather than ORM relationships.
+        db.flush()
+        db.add(
+            ChildProfile(
+                id=LUNA_ID,
+                parent_id=PARENT_ID,
+                nickname="Luna",
+                avatar_url="/avatars/moon.svg",
+                pin_hash=hash_secret("1234"),
+                current_level="E",
+                star_balance=0,
+            )
+        )
+        db.add(
+            ChildProfile(
+                id=LEO_ID,
+                parent_id=PARENT_ID,
+                nickname="Leo",
+                avatar_url="/avatars/lion.svg",
+                pin_hash=hash_secret("2580"),
+                current_level="D",
+                star_balance=0,
+            )
+        )
+    _upsert_catalog(db)
     try:
         db.commit()
     except IntegrityError:

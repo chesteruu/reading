@@ -8,9 +8,9 @@ from pathlib import Path
 OUT = Path(__file__).resolve().parents[1] / "frontend" / "public" / "phonemes"
 
 PHONEMES = {
-    "a": "a:",
+    "a": "a",
     "e": "E",
-    "i": "I",
+    "ih": "I",
     "o": "0",
     "u": "V",
     "ay": "eI",
