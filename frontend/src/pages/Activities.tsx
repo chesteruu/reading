@@ -212,8 +212,8 @@ function Sequencer({
 
   return (
     <div className={`sequencer ${shake ? "shake" : ""}`}>
-      <h2 className="text-center font-display text-4xl">{spec.prompt}</h2>
-      <p className="mt-2 text-center text-lg text-white/75">{message}</p>
+      <h2 className="activity-title text-center font-display text-3xl sm:text-4xl">{spec.prompt}</h2>
+      <p className="activity-sub mt-2 text-center text-base sm:text-lg">{message}</p>
       <div className="mt-5 flex flex-wrap justify-center gap-3">
         {slots.map((cardId, slotIndex) => {
           const frame = frames.find((item) => item.id === cardId);
@@ -222,15 +222,18 @@ function Sequencer({
               key={slotIndex}
               type="button"
               data-slot={slotIndex}
-              className={`slot grid w-40 place-items-center overflow-hidden p-2 ${drag?.over === slotIndex ? "is-over" : ""}`}
+              className={`slot grid place-items-center overflow-hidden p-2 ${drag?.over === slotIndex ? "is-over" : ""}`}
               onClick={() => picked && place(picked, slotIndex)}
               onPointerDown={(event) => frame && beginDrag(frame.id, event)}
             >
-              <span className="text-sm font-extrabold">{slotIndex + 1}</span>
+              <span className="text-sm font-extrabold text-[#241c16]">{slotIndex + 1}</span>
               {frame ? (
-                <img src={frame.image_url} alt={frame.caption} draggable={false} className={drag?.id === frame.id ? "opacity-30" : ""} />
+                <>
+                  <img src={frame.image_url} alt={frame.caption} draggable={false} className={drag?.id === frame.id ? "opacity-30" : ""} />
+                  <span className="slot-caption">{frame.caption}</span>
+                </>
               ) : (
-                <span className="py-8 text-black/40">放到这里</span>
+                <span className="py-8 text-black/45">放到这里</span>
               )}
             </button>
           );
@@ -252,10 +255,13 @@ function Sequencer({
             }}
           >
             <img src={frame.image_url} alt="" draggable={false} />
-            <span className="block px-2 py-2 text-sm leading-snug">{frame.caption}</span>
+            <span className="card-caption">{frame.caption}</span>
           </button>
         ))}
       </div>
+      {!tray.length && !done ? (
+        <p className="activity-sub mt-4 text-center text-sm">四格都填好了。检查一下文字顺序，再点「排好了」。</p>
+      ) : null}
       <div className="mt-6 text-center">
         {done ? (
           <button className="tap rounded-full bg-marigold px-6 font-extrabold text-ink" type="button" onClick={onDone}>下一关</button>
@@ -266,8 +272,9 @@ function Sequencer({
         )}
       </div>
       {drag && dragging ? (
-        <div className="pointer-events-none fixed z-50 w-36 -translate-x-1/2 -translate-y-1/2 overflow-hidden rounded-2xl shadow-2xl" style={{ left: drag.x, top: drag.y }}>
-          <img src={dragging.image_url} alt="" draggable={false} />
+        <div className="pointer-events-none fixed z-50 w-36 -translate-x-1/2 -translate-y-1/2 overflow-hidden rounded-2xl bg-[#fffaf2] shadow-2xl" style={{ left: drag.x, top: drag.y }}>
+          <img src={dragging.image_url} alt="" draggable={false} className="h-24 w-full object-cover" />
+          <span className="card-caption">{dragging.caption}</span>
         </div>
       ) : null}
     </div>
@@ -313,15 +320,15 @@ function Detective({
 
   return (
     <div>
-      <h2 className="text-center font-display text-4xl">{spec.prompt}</h2>
-      <p className="mt-2 text-center text-lg">在画里点一点</p>
+      <h2 className="activity-title text-center font-display text-3xl sm:text-4xl">{spec.prompt}</h2>
+      <p className="activity-sub mt-2 text-center text-base sm:text-lg">在画里点一点</p>
       <div className="detective-scene mt-4" onPointerDown={(event) => void tap(event)}>
         <img src={spec.image_url} alt="" draggable={false} />
         {ripples.map((ripple) => (
           <span key={ripple.id} className={`ripple ${ripple.hit ? "hit" : ""}`} style={{ left: `${ripple.x}%`, top: `${ripple.y}%` }} />
         ))}
       </div>
-      {misses >= 2 && !done ? <p className="mt-4 text-center text-lg text-marigold">{spec.hint}</p> : null}
+      {misses >= 2 && !done ? <p className="mt-4 text-center text-base text-marigold sm:text-lg">{spec.hint}</p> : null}
       {done ? (
         <div className="mt-4 text-center">
           <button className="tap rounded-full bg-marigold px-6 font-extrabold text-ink" type="button" onClick={onDone}>下一关</button>
@@ -405,14 +412,14 @@ function WordMatch({
 
   return (
     <div>
-      <h2 className="text-center font-display text-4xl">{message}</h2>
-      <div ref={boardRef} className="relative mt-6 grid gap-6 md:grid-cols-2">
-        <svg className="pointer-events-none absolute inset-0 h-full w-full">
+      <h2 className="activity-title text-center font-display text-3xl sm:text-4xl">{message}</h2>
+      <div ref={boardRef} className="match-board relative mt-6 grid gap-6 md:grid-cols-2">
+        <svg className="pointer-events-none absolute inset-0 h-full w-full" aria-hidden="true">
           {lines.map((line, index) => (
             <line key={index} x1={line.x1} y1={line.y1} x2={line.x2} y2={line.y2} stroke={line.color} strokeWidth="5" />
           ))}
         </svg>
-        <div className="flex flex-col gap-3">
+        <div className="relative z-[2] flex flex-col gap-3">
           {sounds.map((pair) => (
             <button
               key={pair.id}
@@ -440,7 +447,7 @@ function WordMatch({
             </button>
           ))}
         </div>
-        <div className="flex flex-col gap-3">
+        <div className="relative z-[2] flex flex-col gap-3">
           {cards.map((pair) => (
             <button
               key={pair.id}

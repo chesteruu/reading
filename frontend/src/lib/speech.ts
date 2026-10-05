@@ -194,7 +194,12 @@ export function playSounds(cues: SoundCue[], rate: number, onCue: (index: number
   const run = ++speechGeneration;
   window.clearTimeout(speechTimer);
   window.speechSynthesis?.cancel();
-  clip?.pause();
+  if (clip) {
+    clip.onended = null;
+    clip.onerror = null;
+    clip.pause();
+    clip = null;
+  }
   let index = 0;
   let ended = false;
   const finish = () => {
@@ -209,32 +214,51 @@ export function playSounds(cues: SoundCue[], rate: number, onCue: (index: number
       return;
     }
     const cue = cues[index];
-    onCue(index);
+    const cueIndex = index;
+    let advanced = false;
+    const advance = () => {
+      if (run !== speechGeneration || advanced) return;
+      advanced = true;
+      window.clearTimeout(watchdog);
+      index = cueIndex + 1;
+      step();
+    };
+    onCue(cueIndex);
+    // Safety: never stall the queue if a clip hangs.
+    const watchdog = window.setTimeout(advance, 2500);
+
+    const speakFallback = () => {
+      const text = (cue.say || "").trim();
+      if (!text) {
+        advance();
+        return;
+      }
+      beginUtterance(text, rate, run, { onend: advance });
+    };
+
     if (cue.audio) {
       const audio = new Audio(cue.audio);
       clip = audio;
       audio.preservesPitch = true;
       const safari = audio as HTMLAudioElement & { webkitPreservesPitch?: boolean };
       safari.webkitPreservesPitch = true;
-      audio.defaultPlaybackRate = rate;
-      audio.playbackRate = rate;
-      const advance = () => {
-        if (run !== speechGeneration) return;
-        index += 1;
-        step();
-      };
+      // Keep grapheme clips at natural speed; only stretch whole-word say if needed.
+      const clipRate = cue.say && cue.audio.includes("/phonemes/") ? 1 : rate;
+      audio.defaultPlaybackRate = clipRate;
+      audio.playbackRate = clipRate;
       audio.onended = advance;
-      audio.onerror = advance;
-      void audio.play().catch(advance);
+      audio.onerror = () => {
+        // Missing/broken file → speak the fallback once, do not double-advance.
+        audio.onended = null;
+        speakFallback();
+      };
+      void audio.play().catch(() => {
+        audio.onended = null;
+        speakFallback();
+      });
       return;
     }
-    beginUtterance(cue.say || "", rate, run, {
-      onend: () => {
-        if (run !== speechGeneration) return;
-        index += 1;
-        step();
-      },
-    });
+    speakFallback();
   };
   speechTimer = window.setTimeout(step, 30);
 }

@@ -314,6 +314,7 @@ button {
 .sequencer button {
   touch-action: none;
   user-select: none;
+  -webkit-user-select: none;
 }
 
 .slot,
@@ -323,7 +324,32 @@ button {
   min-height: 72px;
   border-radius: 18px;
   background: #fffaf2;
-  color: var(--ink);
+  color: #241c16;
+}
+
+.slot {
+  width: min(42vw, 10.5rem);
+  min-height: 9.5rem;
+}
+
+.slot img,
+.story-card img {
+  width: 100%;
+  height: 5.5rem;
+  object-fit: cover;
+  display: block;
+  background: #efe6d6;
+}
+
+.slot .slot-caption,
+.story-card .card-caption {
+  display: block;
+  padding: 0.4rem 0.45rem 0.55rem;
+  font-size: 0.78rem;
+  line-height: 1.25;
+  color: #241c16;
+  text-align: left;
+  word-break: break-word;
 }
 
 .slot.is-over {
@@ -336,15 +362,56 @@ button {
 }
 
 .story-card {
-  width: 160px;
+  width: min(42vw, 10.5rem);
   overflow: hidden;
   box-shadow: 0 8px 0 rgba(0, 0, 0, 0.12);
+  background: #fffaf2;
 }
 
-.story-card img,
 .detective-scene img {
   width: 100%;
   display: block;
+}
+
+.match-board {
+  position: relative;
+}
+
+.match-board svg {
+  z-index: 1;
+}
+
+.match-board .sound-bubble,
+.match-board .match-card {
+  position: relative;
+  z-index: 2;
+  background: #fffaf2;
+  color: #241c16;
+}
+
+.activity-title {
+  color: #f7f1e6;
+}
+
+.activity-sub {
+  color: rgba(247, 241, 230, 0.78);
+}
+
+@media (min-width: 720px) {
+  .slot,
+  .story-card {
+    width: 10.5rem;
+  }
+
+  .slot img,
+  .story-card img {
+    height: 7rem;
+  }
+
+  .slot .slot-caption,
+  .story-card .card-caption {
+    font-size: 0.85rem;
+  }
 }
 
 .detective-scene {

@@ -206,8 +206,13 @@ export function Reader() {
         const beat = beats[beatIndex];
         setActive(beat.wordIndex);
         setGraph(beat.graphemeIndex);
-        setCue(beat.graphemeIndex === "all" ? null : beat.letters);
-        setSpoken(beat.graphemeIndex === "all" ? beat.wordIndex : beat.wordIndex - 1);
+        if (beat.graphemeIndex === "all") {
+          setCue(null);
+          setSpoken(beat.wordIndex);
+        } else {
+          setCue(beat.ipa ? `${beat.letters}  /${beat.ipa}/` : beat.letters);
+          setSpoken(beat.wordIndex - 1);
+        }
       },
       () => {
         setGraph(null);

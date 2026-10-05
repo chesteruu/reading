@@ -240,7 +240,41 @@ export function segmentToken(token: string): Grapheme[] {
 }
 
 export function phonemeUrl(id: string): string {
-  return `/phonemes/${id}.mp3?v=6`;
+  return `/phonemes/${id}.mp3?v=7`;
+}
+
+/** IPA tip shown while a grapheme is sounding out. */
+export function ipaOf(speak: string): string {
+  const map: Record<string, string> = {
+    a: "æ",
+    e: "ɛ",
+    ih: "ɪ",
+    o: "ɒ",
+    u: "ʌ",
+    ay: "eɪ",
+    ee: "iː",
+    eye: "aɪ",
+    oh: "oʊ",
+    yoo: "juː",
+    uu: "ʊ",
+    ooh: "uː",
+    ar: "ɑː",
+    er: "ɝ",
+    or: "ɔː",
+    air: "ɛə",
+    ow: "aʊ",
+    oy: "ɔɪ",
+    schwa: "ə",
+    le: "əl",
+    all: "ɔːl",
+    th: "θ",
+    dh: "ð",
+    sh: "ʃ",
+    ch: "tʃ",
+    ng: "ŋ",
+    qu: "kw",
+  };
+  return map[speak] ?? speak;
 }
 
 export type PhonicsBeat = {
@@ -249,6 +283,7 @@ export type PhonicsBeat = {
   wordIndex: number;
   graphemeIndex: number | "all";
   letters: string;
+  ipa: string | null;
 };
 
 export function phonicsBeats(tokens: { word: string }[], decode: boolean): PhonicsBeat[] {
@@ -260,20 +295,22 @@ export function phonicsBeats(tokens: { word: string }[], decode: boolean): Phoni
         if (!graph.speak) return;
         beats.push({
           audio: phonemeUrl(graph.speak),
-          say: null,
+          say: graph.speak,
           wordIndex,
           graphemeIndex,
           letters: graph.text,
+          ipa: ipaOf(graph.speak),
         });
       });
     }
     const core = lettersOf(token.word);
     beats.push({
-      audio: `/voice/words/${core}.mp3?v=1`,
-      say: null,
+      audio: core ? `/voice/words/${core}.mp3?v=2` : null,
+      say: core || token.word,
       wordIndex,
       graphemeIndex: "all",
       letters: core,
+      ipa: null,
     });
   });
   return beats;
