@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 600" width="800" height="600"><defs><linearGradient id="sky" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#d9f0d4"/><stop offset="1" stop-color="#f7f1e6"/></linearGradient></defs><rect width="800" height="600" fill="url(#sky)"/><path d="M0 440 Q200 340 420 400 T800 370 V600 H0 Z" fill="#6ea36a"/><rect x="250" y="180" width="300" height="280" fill="none" stroke="#8a5a38" stroke-width="14"/><path d="M250 180 H550" stroke="#6b442d" stroke-width="10"/><circle cx="470" cy="330" r="6" fill="#f0c14e"/><g transform="translate(180 300) scale(1.2)">
+      <ellipse cx="0" cy="86" rx="32" ry="8" fill="#000" opacity="0.12"/>
+      <path d="M-26 18 h52 l10 52 h-72 z" fill="#f28b82"/>
+      <circle cx="0" cy="-6" r="28" fill="#f3c7a6"/>
+      <path d="M-30 -8 Q-10 -52 28 -18 Q10 -8 -6 2 Q-28 8 -30 -8" fill="#5a3a2e"/>
+      <circle cx="-8" cy="-4" r="3" fill="#2b241c"/>
+      <circle cx="10" cy="-2" r="3" fill="#2b241c"/>
+      <path d="M-6 10 Q2 16 10 10" fill="none" stroke="#c46a5a" stroke-width="2.5" stroke-linecap="round"/>
+      <rect x="-16" y="66" width="14" height="10" rx="3" fill="#2f6f4e"/>
+      <rect x="4" y="66" width="14" height="10" rx="3" fill="#2f6f4e"/>
+    </g></svg>
