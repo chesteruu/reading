@@ -268,6 +268,12 @@ button {
   to { transform: none; opacity: 1; }
 }
 
+.sequencer,
+.sequencer button {
+  touch-action: none;
+  user-select: none;
+}
+
 .slot,
 .story-card,
 .sound-bubble,
@@ -276,6 +282,15 @@ button {
   border-radius: 18px;
   background: #fffaf2;
   color: var(--ink);
+}
+
+.slot.is-over {
+  outline: 4px solid #f0c14e;
+  transform: translateY(-4px);
+}
+
+.story-card.is-dragging {
+  opacity: 0.35;
 }
 
 .story-card {

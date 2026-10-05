@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef, useState, type MutableRefObject, type PointerEvent } from "react";
+import { useEffect, useMemo, useRef, useState, type PointerEvent as ReactPointerEvent } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { api, ApiError } from "../api";
 import { useAuth } from "../auth";
@@ -101,6 +101,25 @@ function shuffle<T>(items: T[]): T[] {
   return copy;
 }
 
+function slotUnderPoint(x: number, y: number): number | null {
+  const ghost = { left: x - 56, top: y - 56, right: x + 56, bottom: y + 56 };
+  let bestIndex: number | null = null;
+  let bestArea = 0;
+  for (const slot of document.querySelectorAll<HTMLElement>("[data-slot]")) {
+    const rect = slot.getBoundingClientRect();
+    const left = Math.max(ghost.left, rect.left - 12);
+    const top = Math.max(ghost.top, rect.top - 12);
+    const right = Math.min(ghost.right, rect.right + 12);
+    const bottom = Math.min(ghost.bottom, rect.bottom + 12);
+    const area = Math.max(0, right - left) * Math.max(0, bottom - top);
+    if (area > bestArea) {
+      bestArea = area;
+      bestIndex = Number(slot.dataset.slot);
+    }
+  }
+  return bestArea > 800 ? bestIndex : null;
+}
+
 function Sequencer({
   spec,
   onSubmit,
@@ -117,11 +136,14 @@ function Sequencer({
   }, [spec]);
   const [slots, setSlots] = useState<(string | null)[]>(() => spec.frames.map(() => null));
   const [picked, setPicked] = useState<string | null>(null);
-  const [drag, setDrag] = useState<{ id: string; x: number; y: number } | null>(null);
+  const [drag, setDrag] = useState<{ id: string; x: number; y: number; over: number | null } | null>(null);
   const [shake, setShake] = useState(false);
-  const [message, setMessage] = useState("把图画拖进 1、2、3、4");
+  const [message, setMessage] = useState("按住图画，拖到 1、2、3、4 上松开");
   const [done, setDone] = useState(false);
-  const moved = useRef(false);
+  const ignoreClick = useRef(false);
+  const stopDrag = useRef<(() => void) | null>(null);
+
+  useEffect(() => () => stopDrag.current?.(), []);
 
   function place(cardId: string, slotIndex: number) {
     setSlots((current) => {
@@ -133,6 +155,43 @@ function Sequencer({
       return next;
     });
     setPicked(null);
+  }
+
+  function beginDrag(cardId: string, event: ReactPointerEvent) {
+    event.preventDefault();
+    event.stopPropagation();
+    const originX = event.clientX;
+    const originY = event.clientY;
+    let moved = false;
+    const move = (pointer: PointerEvent) => {
+      pointer.preventDefault();
+      if (Math.hypot(pointer.clientX - originX, pointer.clientY - originY) > 6) moved = true;
+      setDrag({ id: cardId, x: pointer.clientX, y: pointer.clientY, over: slotUnderPoint(pointer.clientX, pointer.clientY) });
+    };
+    const finish = (pointer: PointerEvent) => {
+      window.removeEventListener("pointermove", move);
+      window.removeEventListener("pointerup", finish);
+      window.removeEventListener("pointercancel", finish);
+      stopDrag.current = null;
+      const over = slotUnderPoint(pointer.clientX, pointer.clientY);
+      setDrag(null);
+      if (moved && over !== null) {
+        ignoreClick.current = true;
+        place(cardId, over);
+        return;
+      }
+      if (!moved) setPicked(cardId);
+    };
+    stopDrag.current?.();
+    window.addEventListener("pointermove", move, { passive: false });
+    window.addEventListener("pointerup", finish);
+    window.addEventListener("pointercancel", finish);
+    stopDrag.current = () => {
+      window.removeEventListener("pointermove", move);
+      window.removeEventListener("pointerup", finish);
+      window.removeEventListener("pointercancel", finish);
+    };
+    setDrag({ id: cardId, x: originX, y: originY, over: slotUnderPoint(originX, originY) });
   }
 
   async function check() {
@@ -149,9 +208,10 @@ function Sequencer({
   }
 
   const tray = frames.filter((frame) => !slots.includes(frame.id));
+  const dragging = frames.find((frame) => frame.id === drag?.id);
 
   return (
-    <div className={shake ? "shake" : ""}>
+    <div className={`sequencer ${shake ? "shake" : ""}`}>
       <h2 className="text-center font-display text-4xl">{spec.prompt}</h2>
       <p className="mt-2 text-center text-lg text-white/75">{message}</p>
       <div className="mt-5 flex flex-wrap justify-center gap-3">
@@ -162,18 +222,38 @@ function Sequencer({
               key={slotIndex}
               type="button"
               data-slot={slotIndex}
-              className="slot grid w-40 place-items-center overflow-hidden p-2"
+              className={`slot grid w-40 place-items-center overflow-hidden p-2 ${drag?.over === slotIndex ? "is-over" : ""}`}
               onClick={() => picked && place(picked, slotIndex)}
+              onPointerDown={(event) => frame && beginDrag(frame.id, event)}
             >
               <span className="text-sm font-extrabold">{slotIndex + 1}</span>
-              {frame ? <img src={frame.image_url} alt={frame.caption} /> : <span className="py-8 text-black/40">放到这里</span>}
+              {frame ? (
+                <img src={frame.image_url} alt={frame.caption} draggable={false} className={drag?.id === frame.id ? "opacity-30" : ""} />
+              ) : (
+                <span className="py-8 text-black/40">放到这里</span>
+              )}
             </button>
           );
         })}
       </div>
       <div className="mt-6 flex flex-wrap justify-center gap-3">
         {tray.map((frame) => (
-          <StoryCard key={frame.id} frame={frame} picked={picked === frame.id} onPick={() => setPicked(frame.id)} onDrop={(slot) => place(frame.id, slot)} onDrag={setDrag} moved={moved} />
+          <button
+            key={frame.id}
+            type="button"
+            className={`story-card text-left ${picked === frame.id ? "outline outline-4 outline-marigold" : ""} ${drag?.id === frame.id ? "is-dragging" : ""}`}
+            onPointerDown={(event) => beginDrag(frame.id, event)}
+            onClick={() => {
+              if (ignoreClick.current) {
+                ignoreClick.current = false;
+                return;
+              }
+              setPicked(frame.id);
+            }}
+          >
+            <img src={frame.image_url} alt="" draggable={false} />
+            <span className="block px-2 py-2 text-sm leading-snug">{frame.caption}</span>
+          </button>
         ))}
       </div>
       <div className="mt-6 text-center">
@@ -185,63 +265,12 @@ function Sequencer({
           </button>
         )}
       </div>
-      {drag ? (
-        <div className="pointer-events-none fixed z-50 w-24 -translate-x-1/2 -translate-y-1/2 rounded-xl bg-white/80 p-1" style={{ left: drag.x, top: drag.y }}>
-          <img src={frames.find((frame) => frame.id === drag.id)?.image_url} alt="" />
+      {drag && dragging ? (
+        <div className="pointer-events-none fixed z-50 w-36 -translate-x-1/2 -translate-y-1/2 overflow-hidden rounded-2xl shadow-2xl" style={{ left: drag.x, top: drag.y }}>
+          <img src={dragging.image_url} alt="" draggable={false} />
         </div>
       ) : null}
     </div>
-  );
-}
-
-function StoryCard({
-  frame,
-  picked,
-  onPick,
-  onDrop,
-  onDrag,
-  moved,
-}: {
-  frame: Frame;
-  picked: boolean;
-  onPick: () => void;
-  onDrop: (slot: number) => void;
-  onDrag: (drag: { id: string; x: number; y: number } | null) => void;
-  moved: MutableRefObject<boolean>;
-}) {
-  const start = useRef({ x: 0, y: 0 });
-  return (
-    <button
-      type="button"
-      className={`story-card text-left ${picked ? "outline outline-4 outline-marigold" : ""}`}
-      onPointerDown={(event) => {
-        start.current = { x: event.clientX, y: event.clientY };
-        moved.current = false;
-        event.currentTarget.setPointerCapture(event.pointerId);
-      }}
-      onPointerMove={(event) => {
-        if (Math.hypot(event.clientX - start.current.x, event.clientY - start.current.y) > 8) {
-          moved.current = true;
-          onDrag({ id: frame.id, x: event.clientX, y: event.clientY });
-        }
-      }}
-      onPointerUp={(event) => {
-        const target = document.elementFromPoint(event.clientX, event.clientY);
-        const slot = target?.closest("[data-slot]");
-        onDrag(null);
-        if (slot) onDrop(Number(slot.getAttribute("data-slot")));
-      }}
-      onClick={() => {
-        if (moved.current) {
-          moved.current = false;
-          return;
-        }
-        onPick();
-      }}
-    >
-      <img src={frame.image_url} alt="" draggable={false} />
-      <span className="block px-2 py-2 text-sm leading-snug">{frame.caption}</span>
-    </button>
   );
 }
 
@@ -262,7 +291,7 @@ function Detective({
     speak(spec.speak, 0.95);
   }, [spec.speak]);
 
-  async function tap(event: PointerEvent<HTMLDivElement>) {
+  async function tap(event: ReactPointerEvent<HTMLDivElement>) {
     if (done) return;
     const rect = event.currentTarget.getBoundingClientRect();
     const x = ((event.clientX - rect.left) / rect.width) * 100;
