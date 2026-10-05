@@ -83,6 +83,8 @@ const CHUNKS = [...Object.keys(CHUNK_SPEAK), ...BLENDS, ...DOUBLES].sort((a, b) 
 const SHORT_OO = new Set(["look", "good", "book", "foot", "wood"]);
 const OVERRIDES: Record<string, Grapheme[]> = {
   a: [{ text: "a", speak: "schwa", kind: "vowel" }],
+  // Pronoun "I" is always long /aɪ/, never short /ɪ/.
+  i: [{ text: "i", speak: "eye", kind: "vowel" }],
   the: [
     { text: "th", speak: "dh", kind: "consonant" },
     { text: "e", speak: "schwa", kind: "vowel" },
