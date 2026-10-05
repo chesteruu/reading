@@ -2,7 +2,7 @@ import { useEffect, useRef, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { api, ApiError } from "../api";
 import { useAuth } from "../auth";
-import { glossKey, pageText, softTick, speak, stopSpeaking } from "../lib/speech";
+import { glossKey, softTick, speak, speakAligned, stopSpeaking } from "../lib/speech";
 import type { AlignmentWord, BookDetail, Gloss, Page } from "../types";
 
 type Bubble = { word: string; gloss?: Gloss; x: number; y: number };
@@ -149,7 +149,6 @@ export function Reader() {
     setSpoken(-1);
     setActive(null);
     const words = page.alignment_data;
-    const end = words[words.length - 1]?.end ?? 0;
     const speed = rateRef.current;
     if (!page.audio_url.startsWith("speech:") && page.audio_url) {
       const audio = new Audio(page.audio_url);
@@ -165,25 +164,26 @@ export function Reader() {
       audio.onended = () => finishPlayback();
       void audio.play().then(() => {
         rafRef.current = requestAnimationFrame(loop);
-      }).catch(() => {
-        speak(pageText(words), speed);
-        runClock(words, end, speed);
-      });
+      }).catch(() => speakSentence(words, speed));
       return;
     }
-    speak(pageText(words), speed);
-    runClock(words, end, speed);
+    speakSentence(words, speed);
   }
 
-  function runClock(words: AlignmentWord[], end: number, speed: number) {
-    const started = performance.now();
-    const loop = (now: number) => {
-      const elapsed = ((now - started) / 1000) * speed;
-      paint(words, elapsed);
-      if (elapsed < end) rafRef.current = requestAnimationFrame(loop);
-      else finishPlayback();
-    };
-    rafRef.current = requestAnimationFrame(loop);
+  function speakSentence(words: AlignmentWord[], speed: number) {
+    speakAligned(
+      words,
+      speed,
+      (wordIndex) => {
+        setActive(wordIndex);
+        setSpoken(wordIndex - 1);
+      },
+      () => {
+        setSpoken(words.length - 1);
+        setActive(null);
+        finishPlayback();
+      },
+    );
   }
 
   useEffect(() => {
@@ -332,7 +332,16 @@ export function Reader() {
             <button className="tap rounded-full bg-persimmon px-5 font-extrabold text-white" type="button" onClick={() => (playing ? stopPlayback() : startPlayback())}>
               {playing ? "暂停" : "播放"}
             </button>
-            <button className="tap rounded-full bg-white/10 px-4 text-paper" type="button" onClick={() => setRate((value) => (value === 1 ? 0.8 : 1))}>
+            <button
+              className="tap rounded-full bg-white/10 px-4 text-paper"
+              type="button"
+              onClick={() => {
+                const next = rate === 1 ? 0.8 : 1;
+                rateRef.current = next;
+                setRate(next);
+                if (playing) startPlayback();
+              }}
+            >
               {rate.toFixed(1)}x
             </button>
             <button className={`tap rounded-full px-4 ${autoAdvance ? "bg-sage text-ink" : "bg-white/10 text-paper"}`} type="button" onClick={() => setAutoAdvance((value) => !value)}>
