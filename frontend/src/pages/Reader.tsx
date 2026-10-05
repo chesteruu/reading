@@ -2,7 +2,8 @@ import { useEffect, useRef, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { api, ApiError } from "../api";
 import { useAuth } from "../auth";
-import { glossKey, softTick, speak, speakAligned, stopSpeaking } from "../lib/speech";
+import { phonicsBeats, segmentToken, type PhonicsBeat } from "../lib/phonics";
+import { glossKey, softTick, speakAligned, stopSpeaking } from "../lib/speech";
 import type { AlignmentWord, BookDetail, Gloss, Page } from "../types";
 
 type Bubble = { word: string; gloss?: Gloss; x: number; y: number };
@@ -18,7 +19,10 @@ export function Reader() {
   const [mode, setMode] = useState<"listen" | "read">("listen");
   const [rate, setRate] = useState<0.8 | 1>(1);
   const [playing, setPlaying] = useState(false);
+  const [phonics, setPhonics] = useState(true);
   const [active, setActive] = useState<number | null>(null);
+  const [graph, setGraph] = useState<number | "all" | null>(null);
+  const [cue, setCue] = useState<{ letters: string; speak: string } | null>(null);
   const [spoken, setSpoken] = useState(-1);
   const [turn, setTurn] = useState<"next" | "prev" | null>(null);
   const [favorites, setFavorites] = useState<Set<string>>(new Set());
@@ -28,6 +32,8 @@ export function Reader() {
   const [autoAdvance, setAutoAdvance] = useState(true);
   const auto = useRef(true);
   auto.current = autoAdvance;
+  const phonicsRef = useRef(true);
+  phonicsRef.current = phonics;
   const modeRef = useRef(mode);
   const rateRef = useRef(rate);
   const pagesRef = useRef<Page[]>([]);
@@ -117,6 +123,8 @@ export function Reader() {
     audioRef.current = null;
     stopSpeaking();
     setPlaying(false);
+    setGraph(null);
+    setCue(null);
   }
 
   function paint(words: AlignmentWord[], elapsed: number) {
@@ -128,6 +136,7 @@ export function Reader() {
     });
     setSpoken(through);
     setActive(current);
+    setGraph(current === null ? null : "all");
   }
 
   function finishPlayback() {
@@ -170,20 +179,32 @@ export function Reader() {
     speakSentence(words, speed);
   }
 
-  function speakSentence(words: AlignmentWord[], speed: number) {
+  function playBeats(beats: PhonicsBeat[], speed: number, onDone: () => void) {
     speakAligned(
-      words,
+      beats.map((beat) => ({ word: beat.speak })),
       speed,
-      (wordIndex) => {
-        setActive(wordIndex);
-        setSpoken(wordIndex - 1);
+      (beatIndex) => {
+        const beat = beats[beatIndex];
+        setActive(beat.wordIndex);
+        setGraph(beat.graphemeIndex);
+        setCue(beat.graphemeIndex === "all" ? null : { letters: beat.letters, speak: beat.speak });
+        setSpoken(beat.graphemeIndex === "all" ? beat.wordIndex : beat.wordIndex - 1);
       },
       () => {
-        setSpoken(words.length - 1);
-        setActive(null);
-        finishPlayback();
+        setGraph(null);
+        setCue(null);
+        onDone();
       },
     );
+  }
+
+  function speakSentence(words: AlignmentWord[], speed: number) {
+    const beats = phonicsBeats(words, phonicsRef.current);
+    playBeats(beats, speed, () => {
+      setSpoken(words.length - 1);
+      setActive(null);
+      finishPlayback();
+    });
   }
 
   useEffect(() => {
@@ -299,16 +320,22 @@ export function Reader() {
               {page.alignment_data.map((word, wordIndex) => {
                 const key = glossKey(word.word);
                 const favored = favorites.has(key);
+                const graphs = segmentToken(word.word);
                 return (
                   <WordButton
                     key={`${page.id}-${wordIndex}`}
-                    label={word.word}
-                    active={active === wordIndex}
+                    graphemes={graphs}
+                    active={active === wordIndex && graph === "all"}
+                    liveGraph={active === wordIndex && typeof graph === "number" ? graph : null}
                     spoken={spoken >= wordIndex && active !== wordIndex}
                     favorite={favored}
                     onTap={() => {
                       stopPlayback();
-                      speak(key || word.word, rateRef.current);
+                      const beats = phonicsBeats([word], true);
+                      playBeats(beats, rateRef.current, () => {
+                        setActive(null);
+                        setSpoken(wordIndex);
+                      });
                       remember(word.word, "tap");
                     }}
                     onFavorite={() => {
@@ -320,6 +347,14 @@ export function Reader() {
                 );
               })}
             </div>
+            {cue ? (
+              <p className="phonics-cue">
+                <span>{cue.letters}</span>
+                <span>读作 {cue.speak}</span>
+              </p>
+            ) : (
+              <p className="phonics-cue is-idle">橙色是元音。拼读会先拆开，再把整个词连起来。</p>
+            )}
           </div>
         </article>
       </div>
@@ -343,6 +378,18 @@ export function Reader() {
               }}
             >
               {rate.toFixed(1)}x
+            </button>
+            <button
+              className={`tap rounded-full px-4 font-extrabold ${phonics ? "bg-persimmon text-white" : "bg-white/10 text-paper"}`}
+              type="button"
+              onClick={() => {
+                const next = !phonics;
+                phonicsRef.current = next;
+                setPhonics(next);
+                if (playing) startPlayback();
+              }}
+            >
+              {phonics ? "拼读" : "整词"}
             </button>
             <button className={`tap rounded-full px-4 ${autoAdvance ? "bg-sage text-ink" : "bg-white/10 text-paper"}`} type="button" onClick={() => setAutoAdvance((value) => !value)}>
               {autoAdvance ? "自动翻页" : "手动翻页"}
@@ -370,16 +417,18 @@ export function Reader() {
 }
 
 function WordButton({
-  label,
+  graphemes,
   active,
+  liveGraph,
   spoken,
   favorite,
   onTap,
   onFavorite,
   onLongPress,
 }: {
-  label: string;
+  graphemes: ReturnType<typeof segmentToken>;
   active: boolean;
+  liveGraph: number | null;
   spoken: boolean;
   favorite: boolean;
   onTap: () => void;
@@ -424,7 +473,15 @@ function WordButton({
         onTap();
       }}
     >
-      {label}
+      {graphemes.map((part, index) => {
+        const linked = liveGraph !== null && part.linkedTo === liveGraph;
+        const live = liveGraph === index || linked || (active && part.kind !== "silent");
+        return (
+          <span key={`${part.text}-${index}`} className={`graph graph-${part.kind} ${live ? "is-live" : ""}`}>
+            {part.text}
+          </span>
+        );
+      })}
     </button>
   );
 }
