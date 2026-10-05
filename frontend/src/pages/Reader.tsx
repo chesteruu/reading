@@ -331,7 +331,7 @@ export function Reader() {
                     favorite={favored}
                     onTap={() => {
                       stopPlayback();
-                      const beats = phonicsBeats([word], true);
+                      const beats = phonicsBeats([word], true).map((beat) => ({ ...beat, wordIndex }));
                       playBeats(beats, rateRef.current, () => {
                         setActive(null);
                         setSpoken(wordIndex);
