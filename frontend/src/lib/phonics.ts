@@ -242,41 +242,98 @@ export function segmentToken(token: string): Grapheme[] {
 }
 
 export function phonemeUrl(id: string): string {
-  return `/phonemes/${id}.mp3?v=7`;
+  return `/phonemes/${id}.mp3?v=8`;
 }
 
-/** IPA tip shown while a grapheme is sounding out. */
+/**
+ * IPA tip for Chinese elementary books (DJ-style).
+ * Prefer ASCII-safe diphthongs (ai/ei/əu) so Android fonts do not turn ɪ into a plain "i".
+ */
 export function ipaOf(speak: string): string {
   const map: Record<string, string> = {
     a: "æ",
-    e: "ɛ",
+    e: "e",
     ih: "ɪ",
     o: "ɒ",
     u: "ʌ",
-    ay: "eɪ",
-    ee: "iː",
-    eye: "aɪ",
-    oh: "oʊ",
-    yoo: "juː",
+    ay: "ei",
+    ee: "i:",
+    eye: "ai",
+    oh: "əu",
+    yoo: "ju:",
     uu: "ʊ",
-    ooh: "uː",
-    ar: "ɑː",
-    er: "ɝ",
-    or: "ɔː",
-    air: "ɛə",
-    ow: "aʊ",
-    oy: "ɔɪ",
+    ooh: "u:",
+    ar: "ɑ:",
+    er: "ɜ:",
+    or: "ɔ:",
+    air: "eə",
+    ow: "au",
+    oy: "ɔi",
     schwa: "ə",
     le: "əl",
-    all: "ɔːl",
+    all: "ɔ:l",
     th: "θ",
     dh: "ð",
     sh: "ʃ",
     ch: "tʃ",
     ng: "ŋ",
     qu: "kw",
+    y: "j",
+    // plain consonants keep their usual symbols
+    b: "b",
+    d: "d",
+    f: "f",
+    g: "g",
+    h: "h",
+    j: "dʒ",
+    k: "k",
+    l: "l",
+    m: "m",
+    n: "n",
+    p: "p",
+    r: "r",
+    s: "s",
+    t: "t",
+    v: "v",
+    w: "w",
+    x: "ks",
+    z: "z",
   };
   return map[speak] ?? speak;
+}
+
+/** Whole-word DJ tip after blending, for high-frequency sight words. */
+export function wordIpa(token: string): string | null {
+  const core = lettersOf(token);
+  const map: Record<string, string> = {
+    i: "ai",
+    a: "ə",
+    the: "ðə",
+    to: "tu:",
+    of: "əv",
+    it: "ɪt",
+    at: "æt",
+    on: "ɒn",
+    in: "ɪn",
+    is: "ɪz",
+    look: "lʊk",
+    boat: "bəut",
+    little: "ˈlɪtl",
+    red: "red",
+    blue: "blu:",
+    sea: "si:",
+    sun: "sʌn",
+    duck: "dʌk",
+    yellow: "ˈjeləu",
+    my: "mai",
+    me: "mi:",
+    we: "wi:",
+    see: "si:",
+    hear: "hɪə",
+    sits: "sɪts",
+    swims: "swɪmz",
+  };
+  return map[core] ?? null;
 }
 
 export type PhonicsBeat = {
@@ -312,7 +369,7 @@ export function phonicsBeats(tokens: { word: string }[], decode: boolean): Phoni
       wordIndex,
       graphemeIndex: "all",
       letters: core,
-      ipa: null,
+      ipa: wordIpa(token.word),
     });
   });
   return beats;

@@ -254,16 +254,18 @@ button {
   display: flex;
   gap: 0.6rem;
   align-items: baseline;
-  font-family: Nunito, sans-serif;
-  font-size: 1.15rem;
+  font-family: "Noto Sans", Nunito, "Segoe UI", sans-serif;
+  font-size: 1.25rem;
   font-weight: 800;
   color: #8a5a38;
+  letter-spacing: 0.02em;
 }
 
 .phonics-cue span:first-child {
-  font-family: Literata, Georgia, serif;
-  font-size: 1.6rem;
+  font-family: "Noto Sans", Literata, Georgia, serif;
+  font-size: 1.75rem;
   color: #c4552a;
+  font-variant-ligatures: none;
 }
 
 .phonics-cue.is-idle {

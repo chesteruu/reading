@@ -207,10 +207,10 @@ export function Reader() {
         setActive(beat.wordIndex);
         setGraph(beat.graphemeIndex);
         if (beat.graphemeIndex === "all") {
-          setCue(null);
+          setCue(beat.ipa ? `${beat.letters}  [${beat.ipa}]` : null);
           setSpoken(beat.wordIndex);
         } else {
-          setCue(beat.ipa ? `${beat.letters}  /${beat.ipa}/` : beat.letters);
+          setCue(beat.ipa ? `${beat.letters}  [${beat.ipa}]` : beat.letters);
           setSpoken(beat.wordIndex - 1);
         }
       },
