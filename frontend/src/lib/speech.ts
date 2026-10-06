@@ -242,13 +242,19 @@ export function playSounds(cues: SoundCue[], rate: number, onCue: (index: number
       audio.preservesPitch = true;
       const safari = audio as HTMLAudioElement & { webkitPreservesPitch?: boolean };
       safari.webkitPreservesPitch = true;
-      // Keep grapheme clips at natural speed; only stretch whole-word say if needed.
-      const clipRate = cue.say && cue.audio.includes("/phonemes/") ? 1 : rate;
+      const isPhoneme = cue.audio.includes("/phonemes/");
+      // Keep grapheme clips at natural speed; boost soft phonemes so phones can hear them.
+      const clipRate = isPhoneme ? 1 : rate;
       audio.defaultPlaybackRate = clipRate;
       audio.playbackRate = clipRate;
-      audio.onended = advance;
+      audio.volume = isPhoneme ? 1 : Math.min(1, 0.95);
+      const goNext = () => {
+        if (run !== speechGeneration) return;
+        // Brief gap after phonemes so quiet onsets are not swallowed by the next clip.
+        window.setTimeout(advance, isPhoneme ? 90 : 20);
+      };
+      audio.onended = goNext;
       audio.onerror = () => {
-        // Missing/broken file → speak the fallback once, do not double-advance.
         audio.onended = null;
         speakFallback();
       };
