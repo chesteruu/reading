@@ -1,0 +1,365 @@
+{
+  "a": {
+    "kind": "vowel",
+    "source": "wikipedia-ipa",
+    "symbol": "æ"
+  },
+  "e": {
+    "kind": "vowel",
+    "source": "wikipedia-ipa",
+    "symbol": "ɛ"
+  },
+  "ih": {
+    "kind": "vowel",
+    "source": "wikipedia-ipa",
+    "symbol": "ɪ"
+  },
+  "o": {
+    "kind": "vowel",
+    "source": "wikipedia-ipa",
+    "symbol": "ɒ"
+  },
+  "u": {
+    "kind": "vowel",
+    "source": "wikipedia-ipa",
+    "symbol": "ʌ"
+  },
+  "uu": {
+    "kind": "vowel",
+    "source": "wikipedia-ipa",
+    "symbol": "ʊ"
+  },
+  "schwa": {
+    "kind": "vowel",
+    "source": "wikipedia-ipa",
+    "symbol": "ə"
+  },
+  "ee": {
+    "kind": "vowel",
+    "source": "wikipedia-ipa",
+    "symbol": "i"
+  },
+  "ooh": {
+    "kind": "vowel",
+    "source": "wikipedia-ipa",
+    "symbol": "u"
+  },
+  "ar": {
+    "kind": "vowel",
+    "source": "wikipedia-ipa",
+    "symbol": "ɑ"
+  },
+  "er": {
+    "kind": "vowel",
+    "source": "wikipedia-ipa",
+    "symbol": "ɜ"
+  },
+  "or": {
+    "kind": "vowel",
+    "source": "wikipedia-ipa",
+    "symbol": "ɔ"
+  },
+  "b": {
+    "kind": "consonant",
+    "source": "wikipedia-ipa",
+    "symbol": "b"
+  },
+  "d": {
+    "kind": "consonant",
+    "source": "wikipedia-ipa",
+    "symbol": "d"
+  },
+  "f": {
+    "kind": "consonant",
+    "source": "wikipedia-ipa",
+    "symbol": "f"
+  },
+  "g": {
+    "kind": "consonant",
+    "source": "wikipedia-ipa",
+    "symbol": "ɡ"
+  },
+  "h": {
+    "kind": "consonant",
+    "source": "wikipedia-ipa",
+    "symbol": "h"
+  },
+  "j": {
+    "kind": "consonant",
+    "source": "wikipedia-ipa",
+    "symbol": "d̠ʒ"
+  },
+  "k": {
+    "kind": "consonant",
+    "source": "wikipedia-ipa",
+    "symbol": "k"
+  },
+  "l": {
+    "kind": "consonant",
+    "source": "wikipedia-ipa",
+    "symbol": "l"
+  },
+  "m": {
+    "kind": "consonant",
+    "source": "wikipedia-ipa",
+    "symbol": "m"
+  },
+  "n": {
+    "kind": "consonant",
+    "source": "wikipedia-ipa",
+    "symbol": "n"
+  },
+  "p": {
+    "kind": "consonant",
+    "source": "wikipedia-ipa",
+    "symbol": "p"
+  },
+  "r": {
+    "kind": "consonant",
+    "source": "wikipedia-ipa",
+    "symbol": "ɹ"
+  },
+  "s": {
+    "kind": "consonant",
+    "source": "wikipedia-ipa",
+    "symbol": "s"
+  },
+  "t": {
+    "kind": "consonant",
+    "source": "wikipedia-ipa",
+    "symbol": "t"
+  },
+  "v": {
+    "kind": "consonant",
+    "source": "wikipedia-ipa",
+    "symbol": "v"
+  },
+  "w": {
+    "kind": "consonant",
+    "source": "wikipedia-ipa",
+    "symbol": "w"
+  },
+  "y": {
+    "kind": "consonant",
+    "source": "wikipedia-ipa",
+    "symbol": "j"
+  },
+  "z": {
+    "kind": "consonant",
+    "source": "wikipedia-ipa",
+    "symbol": "z"
+  },
+  "sh": {
+    "kind": "consonant",
+    "source": "wikipedia-ipa",
+    "symbol": "ʃ"
+  },
+  "ch": {
+    "kind": "consonant",
+    "source": "wikipedia-ipa",
+    "symbol": "t̠ʃ"
+  },
+  "th": {
+    "kind": "consonant",
+    "source": "wikipedia-ipa",
+    "symbol": "θ"
+  },
+  "dh": {
+    "kind": "consonant",
+    "source": "wikipedia-ipa",
+    "symbol": "ð"
+  },
+  "ng": {
+    "kind": "consonant",
+    "source": "wikipedia-ipa",
+    "symbol": "ŋ"
+  },
+  "ay": {
+    "kind": "diphthong",
+    "source": "commons",
+    "file": "En-us-a.ogg"
+  },
+  "eye": {
+    "kind": "diphthong",
+    "source": "commons",
+    "file": "En-us-I.ogg"
+  },
+  "oh": {
+    "kind": "diphthong",
+    "source": "commons",
+    "file": "En-us-owe.ogg"
+  },
+  "ow": {
+    "kind": "diphthong",
+    "source": "commons",
+    "file": "En-us-ow.ogg"
+  },
+  "oy": {
+    "kind": "diphthong",
+    "source": "commons",
+    "file": "En-us-boy.ogg"
+  },
+  "yoo": {
+    "kind": "diphthong",
+    "source": "commons",
+    "file": "En-us-you.ogg"
+  },
+  "air": {
+    "kind": "diphthong",
+    "source": "commons",
+    "file": "En-us-air.ogg"
+  },
+  "all": {
+    "kind": "diphthong",
+    "source": "commons",
+    "file": "En-us-all.ogg"
+  },
+  "x": {
+    "kind": "cluster",
+    "source": "wikipedia-ipa",
+    "symbols": [
+      "k",
+      "s"
+    ]
+  },
+  "qu": {
+    "kind": "cluster",
+    "source": "wikipedia-ipa",
+    "symbols": [
+      "k",
+      "w"
+    ]
+  },
+  "le": {
+    "kind": "cluster",
+    "source": "wikipedia-ipa",
+    "symbols": [
+      "ə",
+      "l"
+    ]
+  },
+  "str": {
+    "kind": "blend",
+    "source": "wikipedia-ipa",
+    "letters": "str"
+  },
+  "spr": {
+    "kind": "blend",
+    "source": "wikipedia-ipa",
+    "letters": "spr"
+  },
+  "scr": {
+    "kind": "blend",
+    "source": "wikipedia-ipa",
+    "letters": "scr"
+  },
+  "bl": {
+    "kind": "blend",
+    "source": "wikipedia-ipa",
+    "letters": "bl"
+  },
+  "br": {
+    "kind": "blend",
+    "source": "wikipedia-ipa",
+    "letters": "br"
+  },
+  "cl": {
+    "kind": "blend",
+    "source": "wikipedia-ipa",
+    "letters": "cl"
+  },
+  "cr": {
+    "kind": "blend",
+    "source": "wikipedia-ipa",
+    "letters": "cr"
+  },
+  "dr": {
+    "kind": "blend",
+    "source": "wikipedia-ipa",
+    "letters": "dr"
+  },
+  "fl": {
+    "kind": "blend",
+    "source": "wikipedia-ipa",
+    "letters": "fl"
+  },
+  "fr": {
+    "kind": "blend",
+    "source": "wikipedia-ipa",
+    "letters": "fr"
+  },
+  "gl": {
+    "kind": "blend",
+    "source": "wikipedia-ipa",
+    "letters": "gl"
+  },
+  "gr": {
+    "kind": "blend",
+    "source": "wikipedia-ipa",
+    "letters": "gr"
+  },
+  "pl": {
+    "kind": "blend",
+    "source": "wikipedia-ipa",
+    "letters": "pl"
+  },
+  "pr": {
+    "kind": "blend",
+    "source": "wikipedia-ipa",
+    "letters": "pr"
+  },
+  "sc": {
+    "kind": "blend",
+    "source": "wikipedia-ipa",
+    "letters": "sc"
+  },
+  "sk": {
+    "kind": "blend",
+    "source": "wikipedia-ipa",
+    "letters": "sk"
+  },
+  "sl": {
+    "kind": "blend",
+    "source": "wikipedia-ipa",
+    "letters": "sl"
+  },
+  "sm": {
+    "kind": "blend",
+    "source": "wikipedia-ipa",
+    "letters": "sm"
+  },
+  "sn": {
+    "kind": "blend",
+    "source": "wikipedia-ipa",
+    "letters": "sn"
+  },
+  "sp": {
+    "kind": "blend",
+    "source": "wikipedia-ipa",
+    "letters": "sp"
+  },
+  "st": {
+    "kind": "blend",
+    "source": "wikipedia-ipa",
+    "letters": "st"
+  },
+  "sw": {
+    "kind": "blend",
+    "source": "wikipedia-ipa",
+    "letters": "sw"
+  },
+  "tr": {
+    "kind": "blend",
+    "source": "wikipedia-ipa",
+    "letters": "tr"
+  },
+  "tw": {
+    "kind": "blend",
+    "source": "wikipedia-ipa",
+    "letters": "tw"
+  },
+  "i": {
+    "kind": "alias",
+    "aliasOf": "ih"
+  }
+}
