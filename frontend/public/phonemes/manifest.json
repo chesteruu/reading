@@ -79,16 +79,6 @@
     "source": "wikipedia-ipa",
     "symbol": "l"
   },
-  "m": {
-    "kind": "consonant",
-    "source": "wikipedia-ipa",
-    "symbol": "m"
-  },
-  "n": {
-    "kind": "consonant",
-    "source": "wikipedia-ipa",
-    "symbol": "n"
-  },
   "r": {
     "kind": "consonant",
     "source": "wikipedia-ipa",
@@ -139,10 +129,26 @@
     "source": "wikipedia-ipa",
     "symbol": "ð"
   },
+  "m": {
+    "kind": "nasal",
+    "source": "wikipedia-ipa-murmur",
+    "symbol": "m",
+    "ss": 0.2,
+    "t": 0.16
+  },
+  "n": {
+    "kind": "nasal",
+    "source": "wikipedia-ipa-murmur",
+    "symbol": "n",
+    "ss": 0.28,
+    "t": 0.16
+  },
   "ng": {
-    "kind": "consonant",
-    "source": "wikipedia-ipa",
-    "symbol": "ŋ"
+    "kind": "nasal",
+    "source": "wikipedia-ipa-murmur",
+    "symbol": "ŋ",
+    "ss": 0.18,
+    "t": 0.16
   },
   "p": {
     "kind": "stop",

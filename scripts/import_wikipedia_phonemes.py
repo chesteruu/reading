@@ -47,8 +47,6 @@ IPA_CONSONANTS: dict[str, str] = {
     "h": "h",
     "j": "d̠ʒ",
     "l": "l",
-    "m": "m",
-    "n": "n",
     "r": "ɹ",
     "s": "s",
     "v": "v",
@@ -59,7 +57,13 @@ IPA_CONSONANTS: dict[str, str] = {
     "ch": "t̠ʃ",
     "th": "θ",
     "dh": "ð",
-    "ng": "ŋ",
+}
+
+# Nasals: IPA chart clips open into a vowel (m→「ma」). Keep only the early murmur.
+NASAL_MURMUR: dict[str, dict] = {
+    "m": {"symbol": "m", "ss": 0.20, "t": 0.16},
+    "n": {"symbol": "n", "ss": 0.28, "t": 0.16},
+    "ng": {"symbol": "ŋ", "ss": 0.18, "t": 0.16},
 }
 
 # English word onsets for stops. IPA-chart /k/ is often unaspirated [k],
@@ -143,6 +147,35 @@ def download_commons(filename: str, dest: Path) -> Path:
         data = urllib.request.urlopen(req, timeout=45).read()
     dest.write_bytes(data)
     return dest
+
+
+def murmur_to_mp3(source: Path, target: Path, *, ss: float, duration: float) -> None:
+    """Keep nasal hum only — fade out before the chart clip opens to a vowel (m→ma)."""
+    target.parent.mkdir(parents=True, exist_ok=True)
+    fade = max(0.04, duration * 0.35)
+    fade_start = max(0.0, duration - fade)
+    subprocess.run(
+        [
+            "ffmpeg",
+            "-y",
+            "-ss",
+            f"{ss:.3f}",
+            "-i",
+            str(source),
+            "-t",
+            f"{duration:.3f}",
+            "-af",
+            f"afade=t=in:st=0:d=0.02,afade=t=out:st={fade_start:.3f}:d={fade:.3f},loudnorm=I=-16:TP=-1.5:LRA=11",
+            "-c:a",
+            "libmp3lame",
+            "-q:a",
+            "4",
+            str(target),
+        ],
+        check=True,
+        stdout=subprocess.DEVNULL,
+        stderr=subprocess.DEVNULL,
+    )
 
 
 def to_mp3(source: Path, target: Path, *, ss: float = 0.0, duration: float | None = None) -> None:
@@ -242,6 +275,22 @@ def main() -> None:
         except Exception as err:
             missing.append(f"{speak}: {err}")
 
+    print("=== nasals (murmur only, no ma/na vowel) ===")
+    for speak, spec in NASAL_MURMUR.items():
+        try:
+            wav = resolve_ipa(root, spec["symbol"])
+            murmur_to_mp3(wav, OUT / f"{speak}.mp3", ss=float(spec["ss"]), duration=float(spec["t"]))
+            manifest[speak] = {
+                "kind": "nasal",
+                "source": "wikipedia-ipa-murmur",
+                "symbol": spec["symbol"],
+                "ss": spec["ss"],
+                "t": spec["t"],
+            }
+            print("  ", speak, "←", spec["symbol"], f"ss={spec['ss']} t={spec['t']}")
+        except Exception as err:
+            missing.append(f"{speak}: {err}")
+
     print("=== stop onsets (aspirated En-us words) ===")
     for speak, spec in STOP_ONSETS.items():
         try:
@@ -311,6 +360,7 @@ All clips are **human recordings**, converted to MP3 for the reader.
 | Kind | Source | License |
 |------|--------|---------|
 | Vowels & most consonants | [cluesurf/wikipedia-ipa](https://huggingface.co/datasets/cluesurf/wikipedia-ipa) | CC-BY-SA 4.0 |
+| Nasals `m n ng` | Same IPA chart, **murmur-only** slice (drops the open vowel so `m` ≠ 「ma」) | CC-BY-SA 4.0 |
 | Stop consonants `p t k b d g` | Commons En-us word **onsets** (aspirated English /k/ etc., so Mandarin ears do not hear IPA [k] as 「ga」) | CC-BY-SA |
 | Diphthongs | Commons `En-us-*.ogg` continuous glides | CC-BY-SA |
 
