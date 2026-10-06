@@ -228,8 +228,18 @@ export function playSounds(cues: SoundCue[], rate: number, onCue: (index: number
     const watchdog = window.setTimeout(advance, 2500);
 
     const speakFallback = () => {
+      // Never speak internal ids like "ih"/"schwa"/"eye" — those sound like nonsense.
+      // Only fall back for whole-word cues that look like real words.
       const text = (cue.say || "").trim();
-      if (!text) {
+      if (!text || text.length <= 3 && !/^[a-zA-Z]+$/.test(text)) {
+        advance();
+        return;
+      }
+      const banned = new Set([
+        "ih", "ay", "ee", "eye", "oh", "yoo", "uu", "ooh", "ar", "er", "or", "air", "ow", "oy",
+        "schwa", "le", "all", "dh", "th", "sh", "ch", "ng", "qu",
+      ]);
+      if (banned.has(text.toLowerCase())) {
         advance();
         return;
       }
