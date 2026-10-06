@@ -4,6 +4,7 @@ import { Activities } from "./pages/Activities";
 import { Album } from "./pages/Album";
 import { Gate } from "./pages/Gate";
 import { Parent } from "./pages/Parent";
+import { PhonicsLab } from "./pages/PhonicsLab";
 import { Reader } from "./pages/Reader";
 import { Rewards } from "./pages/Rewards";
 import { Shelf } from "./pages/Shelf";
@@ -14,6 +15,8 @@ export function App() {
     <Routes>
       <Route path="/" element={<Gate />} />
       <Route path="/shelf" element={<RequireChild><Shelf /></RequireChild>} />
+      <Route path="/phonics" element={<RequireChild><PhonicsLab /></RequireChild>} />
+      <Route path="/phonics/:lessonId" element={<RequireChild><PhonicsLab /></RequireChild>} />
       <Route path="/read/:bookId" element={<RequireChild><Reader /></RequireChild>} />
       <Route path="/activities/:bookId" element={<RequireChild><Activities /></RequireChild>} />
       <Route path="/studio/:bookId" element={<RequireChild><Studio /></RequireChild>} />
