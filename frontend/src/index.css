@@ -230,6 +230,50 @@ button {
   transform: scale(0.98);
 }
 
+.graph {
+  border-radius: 0.28em;
+  padding: 0 0.03em;
+}
+
+.graph-vowel {
+  color: #c4552a;
+}
+
+.graph-silent {
+  color: #a89884;
+}
+
+.graph.is-live {
+  background: #ffe08a;
+  color: #2b2118;
+}
+
+.phonics-cue {
+  min-height: 2.4rem;
+  margin-top: 1rem;
+  display: flex;
+  gap: 0.6rem;
+  align-items: baseline;
+  font-family: "Noto Sans", Nunito, "Segoe UI", sans-serif;
+  font-size: 1.25rem;
+  font-weight: 800;
+  color: #8a5a38;
+  letter-spacing: 0.02em;
+}
+
+.phonics-cue span:first-child {
+  font-family: "Noto Sans", Literata, Georgia, serif;
+  font-size: 1.75rem;
+  color: #c4552a;
+  font-variant-ligatures: none;
+}
+
+.phonics-cue.is-idle {
+  font-weight: 700;
+  color: #8d7b68;
+  font-size: 0.95rem;
+}
+
 .controls {
   display: flex;
   flex-wrap: wrap;
@@ -268,6 +312,13 @@ button {
   to { transform: none; opacity: 1; }
 }
 
+.sequencer,
+.sequencer button {
+  touch-action: none;
+  user-select: none;
+  -webkit-user-select: none;
+}
+
 .slot,
 .story-card,
 .sound-bubble,
@@ -275,19 +326,94 @@ button {
   min-height: 72px;
   border-radius: 18px;
   background: #fffaf2;
-  color: var(--ink);
+  color: #241c16;
+}
+
+.slot {
+  width: min(42vw, 10.5rem);
+  min-height: 9.5rem;
+}
+
+.slot img,
+.story-card img {
+  width: 100%;
+  height: 5.5rem;
+  object-fit: cover;
+  display: block;
+  background: #efe6d6;
+}
+
+.slot .slot-caption,
+.story-card .card-caption {
+  display: block;
+  padding: 0.4rem 0.45rem 0.55rem;
+  font-size: 0.78rem;
+  line-height: 1.25;
+  color: #241c16;
+  text-align: left;
+  word-break: break-word;
+}
+
+.slot.is-over {
+  outline: 4px solid #f0c14e;
+  transform: translateY(-4px);
+}
+
+.story-card.is-dragging {
+  opacity: 0.35;
 }
 
 .story-card {
-  width: 160px;
+  width: min(42vw, 10.5rem);
   overflow: hidden;
   box-shadow: 0 8px 0 rgba(0, 0, 0, 0.12);
+  background: #fffaf2;
 }
 
-.story-card img,
 .detective-scene img {
   width: 100%;
   display: block;
+}
+
+.match-board {
+  position: relative;
+}
+
+.match-board svg {
+  z-index: 1;
+}
+
+.match-board .sound-bubble,
+.match-board .match-card {
+  position: relative;
+  z-index: 2;
+  background: #fffaf2;
+  color: #241c16;
+}
+
+.activity-title {
+  color: #f7f1e6;
+}
+
+.activity-sub {
+  color: rgba(247, 241, 230, 0.78);
+}
+
+@media (min-width: 720px) {
+  .slot,
+  .story-card {
+    width: 10.5rem;
+  }
+
+  .slot img,
+  .story-card img {
+    height: 7rem;
+  }
+
+  .slot .slot-caption,
+  .story-card .card-caption {
+    font-size: 0.85rem;
+  }
 }
 
 .detective-scene {

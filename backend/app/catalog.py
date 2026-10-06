@@ -8,6 +8,9 @@ LEO_ID = "22222222-2222-4222-8222-222222222222"
 BOAT_ID = "33333333-3333-4333-8333-333333333331"
 KEY_ID = "33333333-3333-4333-8333-333333333332"
 MARKET_ID = "33333333-3333-4333-8333-333333333333"
+CAT_ID = "33333333-3333-4333-8333-333333333334"
+RAIN_ID = "33333333-3333-4333-8333-333333333335"
+BUS_ID = "33333333-3333-4333-8333-333333333336"
 
 
 def _pages(book_id: str, sentences: list[tuple[str, str]]) -> list[dict]:
@@ -230,6 +233,183 @@ CATALOG: list[dict] = [
                     {"id": "lantern", "word": "lantern", "emoji": "🏮"},
                     {"id": "mango", "word": "mango", "emoji": "🥭"},
                     {"id": "fox", "word": "fox", "emoji": "🦊"},
+                ],
+            },
+        },
+    },
+    {
+        "id": CAT_ID,
+        "title": "Pat the Fat Cat",
+        "subtitle": "胖胖的猫咪",
+        "level": "B",
+        "genre": "animals",
+        "cover_image_url": "/art/cover-cat.svg",
+        "blurb": "一只胖猫咪跳上垫子，又想喝牛奶。",
+        "accent": "#c47b4a",
+        "glossary": {
+            "pat": {"emoji": "👋", "hint": "Tap gently.", "zh": "拍拍"},
+            "fat": {"emoji": "🐱", "hint": "Not thin.", "zh": "胖的"},
+            "cat": {"emoji": "🐈", "hint": "A soft pet that says meow.", "zh": "猫"},
+            "mat": {"emoji": "🟧", "hint": "A small rug.", "zh": "垫子"},
+            "nap": {"emoji": "😴", "hint": "A short sleep.", "zh": "小睡"},
+            "milk": {"emoji": "🥛", "hint": "A white drink.", "zh": "牛奶"},
+            "lap": {"emoji": "🦵", "hint": "The top of your legs when you sit.", "zh": "大腿上"},
+            "purr": {"emoji": "😻", "hint": "The soft sound a happy cat makes.", "zh": "呼噜"},
+        },
+        "pages": _pages(
+            CAT_ID,
+            [
+                ("/art/cat-1.svg", "Pat the fat cat."),
+                ("/art/cat-2.svg", "The cat is on the mat."),
+                ("/art/cat-3.svg", "The cat has a nap."),
+                ("/art/cat-4.svg", "The cat wants milk."),
+                ("/art/cat-5.svg", "The cat sits on my lap."),
+                ("/art/cat-6.svg", "I hear the cat purr."),
+            ],
+        ),
+        "activities": {
+            "sequencer": {
+                "prompt": "用手指把故事按发生的顺序排好",
+                "frames": [
+                    {"id": "p1", "image_url": "/art/cat-1.svg", "caption": "Pat the fat cat."},
+                    {"id": "p3", "image_url": "/art/cat-3.svg", "caption": "The cat has a nap."},
+                    {"id": "p4", "image_url": "/art/cat-4.svg", "caption": "The cat wants milk."},
+                    {"id": "p6", "image_url": "/art/cat-6.svg", "caption": "I hear the cat purr."},
+                ],
+                "order": ["p1", "p3", "p4", "p6"],
+            },
+            "detective": {
+                "prompt": "Where is the milk?",
+                "speak": "Where is the milk?",
+                "image_url": "/art/cat-4.svg",
+                "hint": "Look at the little bowl on the floor.",
+                "target": {"x": 68, "y": 68, "r": 12},
+            },
+            "word_match": {
+                "prompt": "听一听，把声音拖到对应的词上",
+                "pairs": [
+                    {"id": "cat", "word": "cat", "emoji": "🐈"},
+                    {"id": "mat", "word": "mat", "emoji": "🟧"},
+                    {"id": "milk", "word": "milk", "emoji": "🥛"},
+                    {"id": "nap", "word": "nap", "emoji": "😴"},
+                ],
+            },
+        },
+    },
+    {
+        "id": RAIN_ID,
+        "title": "Rain on the Roof",
+        "subtitle": "屋顶上的雨",
+        "level": "D",
+        "genre": "weather",
+        "cover_image_url": "/art/cover-rain.svg",
+        "blurb": "雨点敲屋顶，我们穿上雨靴出去玩。",
+        "accent": "#3d6d8c",
+        "glossary": {
+            "rain": {"emoji": "🌧️", "hint": "Water falling from the sky.", "zh": "雨"},
+            "roof": {"emoji": "🏠", "hint": "The top of a house.", "zh": "屋顶"},
+            "drops": {"emoji": "💧", "hint": "Little bits of water.", "zh": "雨滴"},
+            "boots": {"emoji": "🥾", "hint": "Tall shoes for wet days.", "zh": "雨靴"},
+            "puddle": {"emoji": "💦", "hint": "A small pool of water.", "zh": "水坑"},
+            "splash": {"emoji": "💦", "hint": "Water jumping up.", "zh": "溅起"},
+            "cloud": {"emoji": "☁️", "hint": "A soft white shape in the sky.", "zh": "云"},
+            "dry": {"emoji": "☀️", "hint": "Not wet.", "zh": "干的"},
+        },
+        "pages": _pages(
+            RAIN_ID,
+            [
+                ("/art/rain-1.svg", "Rain taps on the roof."),
+                ("/art/rain-2.svg", "I see drops on the glass."),
+                ("/art/rain-3.svg", "I put on my boots."),
+                ("/art/rain-4.svg", "We jump in a puddle."),
+                ("/art/rain-5.svg", "Splash! My coat is wet."),
+                ("/art/rain-6.svg", "Then the cloud drifts by."),
+            ],
+        ),
+        "activities": {
+            "sequencer": {
+                "prompt": "用手指把故事按发生的顺序排好",
+                "frames": [
+                    {"id": "p1", "image_url": "/art/rain-1.svg", "caption": "Rain taps on the roof."},
+                    {"id": "p3", "image_url": "/art/rain-3.svg", "caption": "I put on my boots."},
+                    {"id": "p4", "image_url": "/art/rain-4.svg", "caption": "We jump in a puddle."},
+                    {"id": "p6", "image_url": "/art/rain-6.svg", "caption": "Then the cloud drifts by."},
+                ],
+                "order": ["p1", "p3", "p4", "p6"],
+            },
+            "detective": {
+                "prompt": "Where are the boots?",
+                "speak": "Where are the boots?",
+                "image_url": "/art/rain-3.svg",
+                "hint": "They are by the door.",
+                "target": {"x": 62, "y": 70, "r": 12},
+            },
+            "word_match": {
+                "prompt": "听一听，把声音拖到对应的词上",
+                "pairs": [
+                    {"id": "rain", "word": "rain", "emoji": "🌧️"},
+                    {"id": "boots", "word": "boots", "emoji": "🥾"},
+                    {"id": "puddle", "word": "puddle", "emoji": "💦"},
+                    {"id": "cloud", "word": "cloud", "emoji": "☁️"},
+                ],
+            },
+        },
+    },
+    {
+        "id": BUS_ID,
+        "title": "The Big Yellow Bus",
+        "subtitle": "黄色大校车",
+        "level": "E",
+        "genre": "school",
+        "cover_image_url": "/art/cover-bus.svg",
+        "blurb": "校车停在门口，朋友们一起上车去学校。",
+        "accent": "#d6a11a",
+        "glossary": {
+            "bus": {"emoji": "🚌", "hint": "A big car that carries many kids.", "zh": "校车"},
+            "yellow": {"emoji": "🟡", "hint": "The color of a banana.", "zh": "黄色的"},
+            "stops": {"emoji": "🛑", "hint": "Comes to a rest.", "zh": "停下"},
+            "friends": {"emoji": "👭", "hint": "People you like to play with.", "zh": "朋友"},
+            "wave": {"emoji": "👋", "hint": "Move your hand hello.", "zh": "挥手"},
+            "school": {"emoji": "🏫", "hint": "The place you learn.", "zh": "学校"},
+            "bell": {"emoji": "🔔", "hint": "It rings to start the day.", "zh": "铃"},
+            "learn": {"emoji": "📖", "hint": "Find out something new.", "zh": "学习"},
+        },
+        "pages": _pages(
+            BUS_ID,
+            [
+                ("/art/bus-1.svg", "Here comes the yellow bus."),
+                ("/art/bus-2.svg", "The bus stops at my gate."),
+                ("/art/bus-3.svg", "My friends wave to me."),
+                ("/art/bus-4.svg", "We sit and chat."),
+                ("/art/bus-5.svg", "The bus rolls to school."),
+                ("/art/bus-6.svg", "The bell rings. We learn."),
+            ],
+        ),
+        "activities": {
+            "sequencer": {
+                "prompt": "用手指把故事按发生的顺序排好",
+                "frames": [
+                    {"id": "p1", "image_url": "/art/bus-1.svg", "caption": "Here comes the yellow bus."},
+                    {"id": "p2", "image_url": "/art/bus-2.svg", "caption": "The bus stops at my gate."},
+                    {"id": "p5", "image_url": "/art/bus-5.svg", "caption": "The bus rolls to school."},
+                    {"id": "p6", "image_url": "/art/bus-6.svg", "caption": "The bell rings. We learn."},
+                ],
+                "order": ["p1", "p2", "p5", "p6"],
+            },
+            "detective": {
+                "prompt": "Where is the school bell?",
+                "speak": "Where is the school bell?",
+                "image_url": "/art/bus-6.svg",
+                "hint": "It is above the school door.",
+                "target": {"x": 58, "y": 28, "r": 11},
+            },
+            "word_match": {
+                "prompt": "听一听，把声音拖到对应的词上",
+                "pairs": [
+                    {"id": "bus", "word": "bus", "emoji": "🚌"},
+                    {"id": "friends", "word": "friends", "emoji": "👭"},
+                    {"id": "school", "word": "school", "emoji": "🏫"},
+                    {"id": "bell", "word": "bell", "emoji": "🔔"},
                 ],
             },
         },

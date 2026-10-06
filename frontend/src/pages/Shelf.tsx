@@ -37,6 +37,7 @@ export function Shelf() {
           </div>
         </div>
         <nav className="flex flex-wrap gap-2">
+          <Link className="tap grid place-items-center rounded-full bg-persimmon px-4 font-extrabold text-white" to="/phonics">拼读课堂</Link>
           <Link className="tap grid place-items-center rounded-full bg-white/10 px-4" to="/album">小电台</Link>
           <Link className="tap grid place-items-center rounded-full bg-white/10 px-4" to="/parent">家长</Link>
           <button className="tap rounded-full bg-marigold px-4 font-extrabold text-ink" type="button" onClick={() => { auth.lockChild(); navigate("/"); }}>

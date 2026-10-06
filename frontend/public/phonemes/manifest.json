@@ -1,0 +1,344 @@
+{
+  "a": {
+    "kind": "vowel",
+    "source": "wikipedia-ipa",
+    "symbol": "æ"
+  },
+  "e": {
+    "kind": "vowel",
+    "source": "wikipedia-ipa",
+    "symbol": "ɛ"
+  },
+  "ih": {
+    "kind": "vowel",
+    "source": "wikipedia-ipa",
+    "symbol": "ɪ"
+  },
+  "o": {
+    "kind": "vowel",
+    "source": "wikipedia-ipa",
+    "symbol": "ɒ"
+  },
+  "u": {
+    "kind": "vowel",
+    "source": "wikipedia-ipa",
+    "symbol": "ʌ"
+  },
+  "uu": {
+    "kind": "vowel",
+    "source": "wikipedia-ipa",
+    "symbol": "ʊ"
+  },
+  "schwa": {
+    "kind": "vowel",
+    "source": "wikipedia-ipa",
+    "symbol": "ə"
+  },
+  "ee": {
+    "kind": "vowel",
+    "source": "wikipedia-ipa",
+    "symbol": "i"
+  },
+  "ooh": {
+    "kind": "vowel",
+    "source": "wikipedia-ipa",
+    "symbol": "u"
+  },
+  "ar": {
+    "kind": "vowel",
+    "source": "wikipedia-ipa",
+    "symbol": "ɑ"
+  },
+  "er": {
+    "kind": "vowel",
+    "source": "wikipedia-ipa",
+    "symbol": "ɜ"
+  },
+  "or": {
+    "kind": "vowel",
+    "source": "wikipedia-ipa",
+    "symbol": "ɔ"
+  },
+  "f": {
+    "kind": "consonant",
+    "source": "wikipedia-ipa",
+    "symbol": "f"
+  },
+  "h": {
+    "kind": "consonant",
+    "source": "wikipedia-ipa",
+    "symbol": "h"
+  },
+  "j": {
+    "kind": "consonant",
+    "source": "wikipedia-ipa",
+    "symbol": "d̠ʒ"
+  },
+  "l": {
+    "kind": "consonant",
+    "source": "wikipedia-ipa",
+    "symbol": "l"
+  },
+  "r": {
+    "kind": "consonant",
+    "source": "wikipedia-ipa",
+    "symbol": "ɹ"
+  },
+  "s": {
+    "kind": "consonant",
+    "source": "wikipedia-ipa",
+    "symbol": "s"
+  },
+  "v": {
+    "kind": "consonant",
+    "source": "wikipedia-ipa",
+    "symbol": "v"
+  },
+  "w": {
+    "kind": "consonant",
+    "source": "wikipedia-ipa",
+    "symbol": "w"
+  },
+  "y": {
+    "kind": "consonant",
+    "source": "wikipedia-ipa",
+    "symbol": "j"
+  },
+  "z": {
+    "kind": "consonant",
+    "source": "wikipedia-ipa",
+    "symbol": "z"
+  },
+  "sh": {
+    "kind": "consonant",
+    "source": "wikipedia-ipa",
+    "symbol": "ʃ"
+  },
+  "ch": {
+    "kind": "consonant",
+    "source": "wikipedia-ipa",
+    "symbol": "t̠ʃ"
+  },
+  "th": {
+    "kind": "consonant",
+    "source": "wikipedia-ipa",
+    "symbol": "θ"
+  },
+  "dh": {
+    "kind": "consonant",
+    "source": "wikipedia-ipa",
+    "symbol": "ð"
+  },
+  "m": {
+    "kind": "nasal",
+    "source": "wikipedia-ipa-murmur",
+    "symbol": "m",
+    "ss": 0.2,
+    "t": 0.16
+  },
+  "n": {
+    "kind": "nasal",
+    "source": "wikipedia-ipa-murmur",
+    "symbol": "n",
+    "ss": 0.28,
+    "t": 0.16
+  },
+  "ng": {
+    "kind": "nasal",
+    "source": "wikipedia-ipa-murmur",
+    "symbol": "ŋ",
+    "ss": 0.18,
+    "t": 0.16
+  },
+  "p": {
+    "kind": "stop",
+    "source": "commons-onset",
+    "file": "En-us-pen.ogg"
+  },
+  "t": {
+    "kind": "stop",
+    "source": "commons-onset",
+    "file": "En-us-ten.ogg"
+  },
+  "k": {
+    "kind": "stop",
+    "source": "commons-onset",
+    "file": "En-us-key.ogg"
+  },
+  "b": {
+    "kind": "stop",
+    "source": "commons-onset",
+    "file": "En-us-bee.ogg"
+  },
+  "d": {
+    "kind": "stop",
+    "source": "commons-onset",
+    "file": "En-us-day.ogg"
+  },
+  "g": {
+    "kind": "stop",
+    "source": "commons-onset",
+    "file": "En-us-go.ogg"
+  },
+  "ay": {
+    "kind": "diphthong",
+    "source": "commons",
+    "file": "En-us-a.ogg"
+  },
+  "eye": {
+    "kind": "diphthong",
+    "source": "commons",
+    "file": "En-us-I.ogg"
+  },
+  "oh": {
+    "kind": "diphthong",
+    "source": "commons",
+    "file": "En-us-owe.ogg"
+  },
+  "ow": {
+    "kind": "diphthong",
+    "source": "commons",
+    "file": "En-us-ow.ogg"
+  },
+  "oy": {
+    "kind": "diphthong",
+    "source": "commons",
+    "file": "En-us-boy.ogg"
+  },
+  "yoo": {
+    "kind": "diphthong",
+    "source": "commons",
+    "file": "En-us-you.ogg"
+  },
+  "air": {
+    "kind": "diphthong",
+    "source": "commons",
+    "file": "En-us-air.ogg"
+  },
+  "all": {
+    "kind": "diphthong",
+    "source": "commons",
+    "file": "En-us-all.ogg"
+  },
+  "x": {
+    "kind": "cluster",
+    "parts": [
+      "k",
+      "s"
+    ]
+  },
+  "qu": {
+    "kind": "cluster",
+    "parts": [
+      "k",
+      "w"
+    ]
+  },
+  "le": {
+    "kind": "cluster",
+    "parts": [
+      "schwa",
+      "l"
+    ]
+  },
+  "str": {
+    "kind": "blend",
+    "letters": "str"
+  },
+  "spr": {
+    "kind": "blend",
+    "letters": "spr"
+  },
+  "scr": {
+    "kind": "blend",
+    "letters": "scr"
+  },
+  "bl": {
+    "kind": "blend",
+    "letters": "bl"
+  },
+  "br": {
+    "kind": "blend",
+    "letters": "br"
+  },
+  "cl": {
+    "kind": "blend",
+    "letters": "cl"
+  },
+  "cr": {
+    "kind": "blend",
+    "letters": "cr"
+  },
+  "dr": {
+    "kind": "blend",
+    "letters": "dr"
+  },
+  "fl": {
+    "kind": "blend",
+    "letters": "fl"
+  },
+  "fr": {
+    "kind": "blend",
+    "letters": "fr"
+  },
+  "gl": {
+    "kind": "blend",
+    "letters": "gl"
+  },
+  "gr": {
+    "kind": "blend",
+    "letters": "gr"
+  },
+  "pl": {
+    "kind": "blend",
+    "letters": "pl"
+  },
+  "pr": {
+    "kind": "blend",
+    "letters": "pr"
+  },
+  "sc": {
+    "kind": "blend",
+    "letters": "sc"
+  },
+  "sk": {
+    "kind": "blend",
+    "letters": "sk"
+  },
+  "sl": {
+    "kind": "blend",
+    "letters": "sl"
+  },
+  "sm": {
+    "kind": "blend",
+    "letters": "sm"
+  },
+  "sn": {
+    "kind": "blend",
+    "letters": "sn"
+  },
+  "sp": {
+    "kind": "blend",
+    "letters": "sp"
+  },
+  "st": {
+    "kind": "blend",
+    "letters": "st"
+  },
+  "sw": {
+    "kind": "blend",
+    "letters": "sw"
+  },
+  "tr": {
+    "kind": "blend",
+    "letters": "tr"
+  },
+  "tw": {
+    "kind": "blend",
+    "letters": "tw"
+  },
+  "i": {
+    "kind": "alias",
+    "aliasOf": "ih"
+  }
+}

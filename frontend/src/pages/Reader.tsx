@@ -2,7 +2,9 @@ import { useEffect, useRef, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { api, ApiError } from "../api";
 import { useAuth } from "../auth";
-import { glossKey, pageText, softTick, speak, stopSpeaking } from "../lib/speech";
+import { findNarration } from "../lib/narration";
+import { phonicsBeats, segmentToken, type PhonicsBeat } from "../lib/phonics";
+import { glossKey, playSounds, softTick, speakNaturally, stopSpeaking } from "../lib/speech";
 import type { AlignmentWord, BookDetail, Gloss, Page } from "../types";
 
 type Bubble = { word: string; gloss?: Gloss; x: number; y: number };
@@ -16,9 +18,12 @@ export function Reader() {
   const [error, setError] = useState("");
   const [index, setIndex] = useState(0);
   const [mode, setMode] = useState<"listen" | "read">("listen");
-  const [rate, setRate] = useState<0.8 | 1>(1);
+  const [rate, setRate] = useState<0.5 | 0.8 | 1>(1);
   const [playing, setPlaying] = useState(false);
+  const [phonics, setPhonics] = useState(false);
   const [active, setActive] = useState<number | null>(null);
+  const [graph, setGraph] = useState<number | "all" | null>(null);
+  const [cue, setCue] = useState<string | null>(null);
   const [spoken, setSpoken] = useState(-1);
   const [turn, setTurn] = useState<"next" | "prev" | null>(null);
   const [favorites, setFavorites] = useState<Set<string>>(new Set());
@@ -28,6 +33,8 @@ export function Reader() {
   const [autoAdvance, setAutoAdvance] = useState(true);
   const auto = useRef(true);
   auto.current = autoAdvance;
+  const phonicsRef = useRef(false);
+  phonicsRef.current = phonics;
   const modeRef = useRef(mode);
   const rateRef = useRef(rate);
   const pagesRef = useRef<Page[]>([]);
@@ -117,6 +124,8 @@ export function Reader() {
     audioRef.current = null;
     stopSpeaking();
     setPlaying(false);
+    setGraph(null);
+    setCue(null);
   }
 
   function paint(words: AlignmentWord[], elapsed: number) {
@@ -128,6 +137,7 @@ export function Reader() {
     });
     setSpoken(through);
     setActive(current);
+    setGraph(current === null ? null : "all");
   }
 
   function finishPlayback() {
@@ -149,8 +159,25 @@ export function Reader() {
     setSpoken(-1);
     setActive(null);
     const words = page.alignment_data;
-    const end = words[words.length - 1]?.end ?? 0;
     const speed = rateRef.current;
+    const narration = !phonicsRef.current ? findNarration(words) : null;
+    if (narration) {
+      const audio = new Audio(narration.url);
+      audio.preservesPitch = true;
+      const safari = audio as HTMLAudioElement & { webkitPreservesPitch?: boolean };
+      safari.webkitPreservesPitch = true;
+      audio.playbackRate = speed;
+      audioRef.current = audio;
+      const loop = () => {
+        paint(narration.words, audio.currentTime);
+        if (!audio.paused && !audio.ended) rafRef.current = requestAnimationFrame(loop);
+      };
+      audio.onended = () => finishPlayback();
+      void audio.play().then(() => {
+        rafRef.current = requestAnimationFrame(loop);
+      }).catch(() => speakSentence(words, speed));
+      return;
+    }
     if (!page.audio_url.startsWith("speech:") && page.audio_url) {
       const audio = new Audio(page.audio_url);
       audio.preservesPitch = true;
@@ -165,25 +192,63 @@ export function Reader() {
       audio.onended = () => finishPlayback();
       void audio.play().then(() => {
         rafRef.current = requestAnimationFrame(loop);
-      }).catch(() => {
-        speak(pageText(words), speed);
-        runClock(words, end, speed);
+      }).catch(() => speakSentence(words, speed));
+      return;
+    }
+    speakSentence(words, speed);
+  }
+
+  function playBeats(beats: PhonicsBeat[], speed: number, onDone: () => void) {
+    playSounds(
+      beats.map((beat) => ({ audio: beat.audio, say: beat.say })),
+      speed,
+      (beatIndex) => {
+        const beat = beats[beatIndex];
+        setActive(beat.wordIndex);
+        setGraph(beat.graphemeIndex);
+        if (beat.graphemeIndex === "all") {
+          setCue(beat.ipa ? `${beat.letters}  [${beat.ipa}]` : null);
+          setSpoken(beat.wordIndex);
+        } else {
+          const tip = beat.ipa ? `${beat.letters}  [${beat.ipa}]` : beat.letters;
+          setCue(beat.hint ? `${tip}  ·  ${beat.hint}` : tip);
+          setSpoken(beat.wordIndex - 1);
+        }
+      },
+      () => {
+        setGraph(null);
+        setCue(null);
+        onDone();
+      },
+    );
+  }
+
+  function speakSentence(words: AlignmentWord[], speed: number) {
+    if (phonicsRef.current) {
+      const beats = phonicsBeats(words, true);
+      playBeats(beats, 1, () => {
+        setSpoken(words.length - 1);
+        setActive(null);
+        finishPlayback();
       });
       return;
     }
-    speak(pageText(words), speed);
-    runClock(words, end, speed);
-  }
-
-  function runClock(words: AlignmentWord[], end: number, speed: number) {
-    const started = performance.now();
-    const loop = (now: number) => {
-      const elapsed = ((now - started) / 1000) * speed;
-      paint(words, elapsed);
-      if (elapsed < end) rafRef.current = requestAnimationFrame(loop);
-      else finishPlayback();
-    };
-    rafRef.current = requestAnimationFrame(loop);
+    speakNaturally(
+      words,
+      speed,
+      (wordIndex) => {
+        setActive(wordIndex);
+        setGraph("all");
+        setCue(null);
+        setSpoken(wordIndex - 1);
+      },
+      () => {
+        setSpoken(words.length - 1);
+        setActive(null);
+        setGraph(null);
+        finishPlayback();
+      },
+    );
   }
 
   useEffect(() => {
@@ -299,16 +364,22 @@ export function Reader() {
               {page.alignment_data.map((word, wordIndex) => {
                 const key = glossKey(word.word);
                 const favored = favorites.has(key);
+                const graphs = segmentToken(word.word);
                 return (
                   <WordButton
                     key={`${page.id}-${wordIndex}`}
-                    label={word.word}
-                    active={active === wordIndex}
+                    graphemes={graphs}
+                    active={active === wordIndex && graph === "all"}
+                    liveGraph={active === wordIndex && typeof graph === "number" ? graph : null}
                     spoken={spoken >= wordIndex && active !== wordIndex}
                     favorite={favored}
                     onTap={() => {
                       stopPlayback();
-                      speak(key || word.word, rateRef.current);
+                      const beats = phonicsBeats([word], true).map((beat) => ({ ...beat, wordIndex }));
+                      playBeats(beats, 1, () => {
+                        setActive(null);
+                        setSpoken(wordIndex);
+                      });
                       remember(word.word, "tap");
                     }}
                     onFavorite={() => {
@@ -320,6 +391,13 @@ export function Reader() {
                 );
               })}
             </div>
+            {cue ? (
+              <p className="phonics-cue">
+                <span>{cue}</span>
+              </p>
+            ) : (
+              <p className="phonics-cue is-idle">播放按整句来读。点一个词，才会把这个词拆开拼读。</p>
+            )}
           </div>
         </article>
       </div>
@@ -332,8 +410,31 @@ export function Reader() {
             <button className="tap rounded-full bg-persimmon px-5 font-extrabold text-white" type="button" onClick={() => (playing ? stopPlayback() : startPlayback())}>
               {playing ? "暂停" : "播放"}
             </button>
-            <button className="tap rounded-full bg-white/10 px-4 text-paper" type="button" onClick={() => setRate((value) => (value === 1 ? 0.8 : 1))}>
-              {rate.toFixed(1)}x
+            <button
+              className="tap rounded-full bg-white/10 px-4 text-paper disabled:opacity-80"
+              type="button"
+              disabled={phonics}
+              onClick={() => {
+                const steps = [1, 0.8, 0.5] as const;
+                const next = steps[(steps.indexOf(rate) + 1) % steps.length];
+                rateRef.current = next;
+                setRate(next);
+                if (playing && !phonicsRef.current) startPlayback();
+              }}
+            >
+              {phonics ? "1.0x" : `${rate.toFixed(1)}x`}
+            </button>
+            <button
+              className={`tap rounded-full px-4 font-extrabold ${phonics ? "bg-persimmon text-white" : "bg-white/10 text-paper"}`}
+              type="button"
+              onClick={() => {
+                const next = !phonics;
+                phonicsRef.current = next;
+                setPhonics(next);
+                if (playing) startPlayback();
+              }}
+            >
+              {phonics ? "拼读" : "整词"}
             </button>
             <button className={`tap rounded-full px-4 ${autoAdvance ? "bg-sage text-ink" : "bg-white/10 text-paper"}`} type="button" onClick={() => setAutoAdvance((value) => !value)}>
               {autoAdvance ? "自动翻页" : "手动翻页"}
@@ -361,16 +462,18 @@ export function Reader() {
 }
 
 function WordButton({
-  label,
+  graphemes,
   active,
+  liveGraph,
   spoken,
   favorite,
   onTap,
   onFavorite,
   onLongPress,
 }: {
-  label: string;
+  graphemes: ReturnType<typeof segmentToken>;
   active: boolean;
+  liveGraph: number | null;
   spoken: boolean;
   favorite: boolean;
   onTap: () => void;
@@ -415,7 +518,15 @@ function WordButton({
         onTap();
       }}
     >
-      {label}
+      {graphemes.map((part, index) => {
+        const linked = liveGraph !== null && part.linkedTo === liveGraph;
+        const live = liveGraph === index || linked || (active && part.kind !== "silent");
+        return (
+          <span key={`${part.text}-${index}`} className={`graph graph-${part.kind} ${live ? "is-live" : ""}`}>
+            {part.text}
+          </span>
+        );
+      })}
     </button>
   );
 }
