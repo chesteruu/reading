@@ -2,6 +2,7 @@
 
 import asyncio
 import json
+import os
 import re
 import subprocess
 import sys
@@ -20,7 +21,8 @@ WORD_DIR = PUBLIC / "voice" / "words"
 SENTENCE_DIR = PUBLIC / "voice" / "sentences"
 NARRATION_PATH = ROOT / "frontend" / "src" / "data" / "narration.json"
 
-# Keys are /phonemes/{key}.mp3 ids. Short /ɪ/ is "ih" (not letter-name "i").
+# Keys are /phonemes/{key}.mp3 ids. Default clips come from human Wikipedia IPA
+# (scripts/import_wikipedia_phonemes.py). Set REGENERATE_PHONEMES=1 to overwrite with Jenny.
 PHONEMES = {
     "a": "ah",
     "e": "eh",
@@ -155,20 +157,22 @@ async def main() -> None:
         await synthesize(word, WORD_DIR / f"{word}.mp3")
     print("words", len(words))
 
-    vowels = {"a", "e", "ih", "o", "u", "ay", "ee", "eye", "oh", "yoo", "uu", "ooh", "ar", "er", "or", "air", "ow", "oy", "schwa", "le", "all"}
-    for name, prompt in {**PHONEMES, **BLENDS}.items():
-        target = PHONEME_DIR / f"{name}.mp3"
-        await synthesize(prompt, target)
-        if name not in vowels:
-            trimmed = target.with_suffix(".trim.mp3")
-            subprocess_trim(target, trimmed)
-            trimmed.replace(target)
-    # Legacy alias so old clients asking for i.mp3 still get short /ɪ/.
-    legacy = PHONEME_DIR / "i.mp3"
-    legacy.write_bytes((PHONEME_DIR / "ih.mp3").read_bytes())
-    for old in PHONEME_DIR.glob("*.wav"):
-        old.unlink()
-    print("phonemes", len(PHONEMES))
+    if os.environ.get("REGENERATE_PHONEMES") == "1":
+        vowels = {"a", "e", "ih", "o", "u", "ay", "ee", "eye", "oh", "yoo", "uu", "ooh", "ar", "er", "or", "air", "ow", "oy", "schwa", "le", "all"}
+        for name, prompt in {**PHONEMES, **BLENDS}.items():
+            target = PHONEME_DIR / f"{name}.mp3"
+            await synthesize(prompt, target)
+            if name not in vowels:
+                trimmed = target.with_suffix(".trim.mp3")
+                subprocess_trim(target, trimmed)
+                trimmed.replace(target)
+        legacy = PHONEME_DIR / "i.mp3"
+        legacy.write_bytes((PHONEME_DIR / "ih.mp3").read_bytes())
+        for old in PHONEME_DIR.glob("*.wav"):
+            old.unlink()
+        print("phonemes (Jenny)", len(PHONEMES))
+    else:
+        print("phonemes skipped — using Wikipedia IPA clips (import_wikipedia_phonemes.py)")
 
     NARRATION_PATH.parent.mkdir(parents=True, exist_ok=True)
     NARRATION_PATH.write_text(json.dumps(narration, ensure_ascii=False, indent=2), encoding="utf-8")
