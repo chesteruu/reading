@@ -242,12 +242,13 @@ export function segmentToken(token: string): Grapheme[] {
 }
 
 export function phonemeUrl(id: string): string {
-  return `/phonemes/${id}.mp3?v=11`;
+  return `/phonemes/${id}.mp3?v=12`;
 }
 
 /**
- * IPA tip for Chinese elementary books (DJ-style).
- * Prefer ASCII-safe diphthongs (ai/ei/əu) so Android fonts do not turn ɪ into a plain "i".
+ * DJ-style tip for Chinese elementary books.
+ * Avoid glyphs that Android fonts render as junk (ʌ→^, ɪ→i).
+ * Use stable lookalikes + ASCII diphthongs kids already know.
  */
 export function ipaOf(speak: string): string {
   const map: Record<string, string> = {
@@ -255,7 +256,8 @@ export function ipaOf(speak: string): string {
     e: "e",
     ih: "ɪ",
     o: "ɒ",
-    u: "ʌ",
+    // Greek Λ renders reliably; real ʌ often becomes "^" on Android.
+    u: "Λ",
     ay: "ei",
     ee: "i:",
     eye: "ai",
@@ -279,7 +281,6 @@ export function ipaOf(speak: string): string {
     ng: "ŋ",
     qu: "kw",
     y: "j",
-    // plain consonants keep their usual symbols
     b: "b",
     d: "d",
     f: "f",
@@ -302,6 +303,31 @@ export function ipaOf(speak: string): string {
   return map[speak] ?? speak;
 }
 
+/** Extra Chinese-friendly hint under the symbol, e.g. u → uh. */
+export function ipaHint(speak: string): string | null {
+  const map: Record<string, string> = {
+    a: "像 cat",
+    e: "像 bed",
+    ih: "像 it",
+    o: "像 hot",
+    u: "像 cup / sun",
+    ay: "像 day",
+    ee: "像 see",
+    eye: "像 I / my",
+    oh: "像 go / boat",
+    yoo: "像 you",
+    uu: "像 look",
+    ooh: "像 moon",
+    schwa: "轻声 ə",
+    dh: "the 的 th",
+    th: "think 的 th",
+    sh: "嘘 sh",
+    ch: "像 chip",
+    ng: "像 sing",
+  };
+  return map[speak] ?? null;
+}
+
 /** Whole-word DJ tip after blending, for high-frequency sight words. */
 export function wordIpa(token: string): string | null {
   const core = lettersOf(token);
@@ -322,8 +348,8 @@ export function wordIpa(token: string): string | null {
     red: "red",
     blue: "blu:",
     sea: "si:",
-    sun: "sʌn",
-    duck: "dʌk",
+    sun: "sΛn",
+    duck: "dΛk",
     yellow: "ˈjeləu",
     my: "mai",
     me: "mi:",
@@ -343,6 +369,7 @@ export type PhonicsBeat = {
   graphemeIndex: number | "all";
   letters: string;
   ipa: string | null;
+  hint: string | null;
 };
 
 export function phonicsBeats(tokens: { word: string }[], decode: boolean): PhonicsBeat[] {
@@ -354,11 +381,12 @@ export function phonicsBeats(tokens: { word: string }[], decode: boolean): Phoni
         if (!graph.speak) return;
         beats.push({
           audio: phonemeUrl(graph.speak),
-          say: graph.speak,
+          say: null,
           wordIndex,
           graphemeIndex,
           letters: graph.text,
           ipa: ipaOf(graph.speak),
+          hint: ipaHint(graph.speak),
         });
       });
     }
@@ -370,6 +398,7 @@ export function phonicsBeats(tokens: { word: string }[], decode: boolean): Phoni
       graphemeIndex: "all",
       letters: core,
       ipa: wordIpa(token.word),
+      hint: null,
     });
   });
   return beats;

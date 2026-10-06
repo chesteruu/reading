@@ -210,7 +210,8 @@ export function Reader() {
           setCue(beat.ipa ? `${beat.letters}  [${beat.ipa}]` : null);
           setSpoken(beat.wordIndex);
         } else {
-          setCue(beat.ipa ? `${beat.letters}  [${beat.ipa}]` : beat.letters);
+          const tip = beat.ipa ? `${beat.letters}  [${beat.ipa}]` : beat.letters;
+          setCue(beat.hint ? `${tip}  ·  ${beat.hint}` : tip);
           setSpoken(beat.wordIndex - 1);
         }
       },
