@@ -43,20 +43,14 @@ IPA_VOWELS: dict[str, str] = {
 }
 
 IPA_CONSONANTS: dict[str, str] = {
-    "b": "b",
-    "d": "d",
     "f": "f",
-    "g": "ɡ",
     "h": "h",
     "j": "d̠ʒ",
-    "k": "k",
     "l": "l",
     "m": "m",
     "n": "n",
-    "p": "p",
     "r": "ɹ",
     "s": "s",
-    "t": "t",
     "v": "v",
     "w": "w",
     "y": "j",
@@ -68,12 +62,19 @@ IPA_CONSONANTS: dict[str, str] = {
     "ng": "ŋ",
 }
 
-# Clusters built once at import time into a single mp3 (still one file to play).
-IPA_CLUSTERS: dict[str, list[str]] = {
-    "x": ["k", "s"],
-    "qu": ["k", "w"],
-    "le": ["ə", "l"],
+# English word onsets for stops. IPA-chart /k/ is often unaspirated [k],
+# which Mandarin ears hear as 「ga」(ㄍ). Use aspirated En-us word attacks instead.
+STOP_ONSETS: dict[str, dict] = {
+    # Prefer words whose vowel is NOT open /a/ — otherwise Chinese ears hear 「ga」.
+    "p": {"file": "En-us-pen.ogg", "ss": 0.0, "t": 0.11},
+    "t": {"file": "En-us-ten.ogg", "ss": 0.0, "t": 0.11},
+    "k": {"file": "En-us-key.ogg", "ss": 0.0, "t": 0.11},  # aspirated /kʰ/, not IPA [k]→「ga」
+    "b": {"file": "En-us-bee.ogg", "ss": 0.0, "t": 0.11},
+    "d": {"file": "En-us-day.ogg", "ss": 0.0, "t": 0.10},
+    "g": {"file": "En-us-go.ogg", "ss": 0.0, "t": 0.11},
 }
+
+# Clusters are assembled in main() from already-baked clips (x=k+s, qu=k+w, le=schwa+l).
 
 # Continuous diphthong / rime clips — NEVER stitch monophthongs for these.
 DIPHTHONGS: dict[str, dict] = {
@@ -145,26 +146,37 @@ def download_commons(filename: str, dest: Path) -> Path:
 
 
 def to_mp3(source: Path, target: Path, *, ss: float = 0.0, duration: float | None = None) -> None:
-    """Light trim + loudness match. Keep natural length when duration is None."""
+    """Light trim + loudness match. Strip leading/trailing silence before duration cap."""
     target.parent.mkdir(parents=True, exist_ok=True)
-    args = ["ffmpeg", "-y"]
-    if ss > 0:
-        args += ["-ss", f"{ss:.3f}"]
-    args += ["-i", str(source)]
-    if duration is not None:
-        args += ["-t", f"{duration:.3f}"]
-    args += [
-        "-af",
-        "silenceremove=start_periods=1:start_silence=0.02:start_threshold=-40dB,"
-        "areverse,silenceremove=start_periods=1:start_silence=0.02:start_threshold=-40dB,areverse,"
-        "loudnorm=I=-16:TP=-1.5:LRA=11",
-        "-c:a",
-        "libmp3lame",
-        "-q:a",
-        "4",
-        str(target),
-    ]
-    subprocess.run(args, check=True, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+    # First pass: optional seek + silence strip to wav, then loudnorm/mp3 with duration.
+    with tempfile.TemporaryDirectory() as tmp:
+        cleaned = Path(tmp) / "cleaned.wav"
+        args = ["ffmpeg", "-y"]
+        if ss > 0:
+            args += ["-ss", f"{ss:.3f}"]
+        args += [
+            "-i",
+            str(source),
+            "-af",
+            "silenceremove=start_periods=1:start_silence=0.01:start_threshold=-40dB,"
+            "areverse,silenceremove=start_periods=1:start_silence=0.01:start_threshold=-40dB,areverse",
+            str(cleaned),
+        ]
+        subprocess.run(args, check=True, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+
+        args2 = ["ffmpeg", "-y", "-i", str(cleaned)]
+        if duration is not None:
+            args2 += ["-t", f"{duration:.3f}"]
+        args2 += [
+            "-af",
+            "loudnorm=I=-16:TP=-1.5:LRA=11",
+            "-c:a",
+            "libmp3lame",
+            "-q:a",
+            "4",
+            str(target),
+        ]
+        subprocess.run(args2, check=True, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
 
 
 def concat_sources(sources: list[Path], target: Path, *, part_t: float = 0.2) -> None:
@@ -230,6 +242,17 @@ def main() -> None:
         except Exception as err:
             missing.append(f"{speak}: {err}")
 
+    print("=== stop onsets (aspirated En-us words) ===")
+    for speak, spec in STOP_ONSETS.items():
+        try:
+            ogg = download_commons(spec["file"], cache / spec["file"])
+            # Strip leading silence then keep only the attack (+ tiny vowel color).
+            to_mp3(ogg, OUT / f"{speak}.mp3", ss=float(spec["ss"]), duration=float(spec["t"]))
+            manifest[speak] = {"kind": "stop", "source": "commons-onset", "file": spec["file"]}
+            print("  ", speak, "←", spec["file"])
+        except Exception as err:
+            missing.append(f"{speak}: {err}")
+
     print("=== diphthongs (continuous Commons) ===")
     for speak, spec in DIPHTHONGS.items():
         try:
@@ -241,24 +264,36 @@ def main() -> None:
             missing.append(f"{speak}: {err}")
 
     print("=== clusters ===")
-    for speak, symbols in IPA_CLUSTERS.items():
+    # x=/ks/, qu=/kw/ — stitch already-baked stop + consonant clips.
+    cluster_ids = {
+        "x": ["k", "s"],
+        "qu": ["k", "w"],
+        "le": ["schwa", "l"],
+    }
+    for speak, parts in cluster_ids.items():
         try:
-            wavs = [resolve_ipa(root, s) for s in symbols]
-            concat_sources(wavs, OUT / f"{speak}.mp3")
-            manifest[speak] = {"kind": "cluster", "source": "wikipedia-ipa", "symbols": symbols}
-            print("  ", speak, "←", "+".join(symbols))
+            sources = [OUT / f"{p}.mp3" for p in parts]
+            for src in sources:
+                if not src.is_file():
+                    raise FileNotFoundError(src)
+            concat_sources(sources, OUT / f"{speak}.mp3", part_t=0.16)
+            manifest[speak] = {"kind": "cluster", "parts": parts}
+            print("  ", speak, "←", "+".join(parts))
         except Exception as err:
             missing.append(f"{speak}: {err}")
 
     print("=== blends ===")
     for blend in BLENDS:
         try:
-            wavs: list[Path] = []
+            sources = []
             for letter in blend:
                 key = {"c": "k", "q": "k"}.get(letter, letter)
-                wavs.append(resolve_ipa(root, IPA_CONSONANTS[key]))
-            concat_sources(wavs, OUT / f"{blend}.mp3", part_t=0.16)
-            manifest[blend] = {"kind": "blend", "source": "wikipedia-ipa", "letters": blend}
+                path = OUT / f"{key}.mp3"
+                if not path.is_file():
+                    raise FileNotFoundError(path)
+                sources.append(path)
+            concat_sources(sources, OUT / f"{blend}.mp3", part_t=0.14)
+            manifest[blend] = {"kind": "blend", "letters": blend}
             print("  ", blend)
         except Exception as err:
             missing.append(f"{blend}: {err}")
@@ -275,8 +310,9 @@ All clips are **human recordings**, converted to MP3 for the reader.
 
 | Kind | Source | License |
 |------|--------|---------|
-| Vowels & consonants | [cluesurf/wikipedia-ipa](https://huggingface.co/datasets/cluesurf/wikipedia-ipa) (Wikimedia IPA chart) | CC-BY-SA 4.0 |
-| Diphthongs | Wikimedia Commons `En-us-*.ogg` word recordings (trimmed to the glide) | CC-BY-SA |
+| Vowels & most consonants | [cluesurf/wikipedia-ipa](https://huggingface.co/datasets/cluesurf/wikipedia-ipa) | CC-BY-SA 4.0 |
+| Stop consonants `p t k b d g` | Commons En-us word **onsets** (aspirated English /k/ etc., so Mandarin ears do not hear IPA [k] as 「ga」) | CC-BY-SA |
+| Diphthongs | Commons `En-us-*.ogg` continuous glides | CC-BY-SA |
 
 Regenerate: `python3 scripts/import_wikipedia_phonemes.py`
 
